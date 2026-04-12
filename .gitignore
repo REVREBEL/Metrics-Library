@@ -61,3 +61,31 @@ npm-debug.log*
 *.csv
 *.xlsx
 
+
+# --- Utilities/bq-utils Specific Ignores ---
+
+# Byte-compiled / optimized / DLL files
+Utilities/bq-utils/**/__pycache__/
+Utilities/bq-utils/**/*.py[cod]
+Utilities/bq-utils/**/.*$py.class
+
+# Distribution / packaging / Environments
+Utilities/bq-utils/**/.Python
+Utilities/bq-utils/**/build/
+Utilities/bq-utils/**/dist/
+Utilities/bq-utils/**/lib/
+Utilities/bq-utils/**/lib64/
+Utilities/bq-utils/**/*.egg-info/
+Utilities/bq-utils/**/.env
+Utilities/bq-utils/**/.venv
+Utilities/bq-utils/**/env/
+Utilities/bq-utils/**/venv/
+
+# Unit test / coverage / temporary logs
+Utilities/bq-utils/**/htmlcov/
+Utilities/bq-utils/**/.pytest_cache/
+Utilities/bq-utils/**/*.log
+Utilities/bq-utils/**/.ipynb_checkpoints/
+
+# MyPy and other caches
+Utilities/bq-utils/**/.mypy_cache/
