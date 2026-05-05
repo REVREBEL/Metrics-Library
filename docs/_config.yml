@@ -1,0 +1,8 @@
+remote_theme: just-the-docs/just-the-docs
+title: Metrics Library by REVREBEL
+
+aux_links:
+	"Project on GitHub":
+		- https://github.com/REVREBEL/Metrics-Library
+# This tells Jekyll to include your styles
+css_bundle: "/assets/css/custom.scss"

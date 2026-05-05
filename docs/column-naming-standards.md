@@ -4,6 +4,9 @@ This document defines the standard naming system for database columns across the
 
 The goal is not just cleaner names. The goal is a durable semantic layer where analysts, dashboards, pipelines, and automated documentation can infer meaning from a column name without needing to inspect every upstream table.
 
+<br>
+<br>
+
 ## Status
 
 **Version:** Draft v0.2  
@@ -718,3 +721,27 @@ Use this document to generate:
 3. a column description template library,
 4. a validation script that flags deprecated variants in schemas,
 5. a source-value mapping inventory for `_map` fields.
+
+
+
+> Test Blockquote
+
+
+
+<details> & <summary>: Create collapsible toggles.
+
+
+<sub> For subscripts.
+
+<sup>: For superscripts.
+
+<kbd>: For keyboard shortcuts (renders as a little button).
+
+
+<table>: For more advanced table formatting than standard Markdown pipes.
+
+
+
+
+
+$\color{red}{\text{This text is red}}$
