@@ -42,8 +42,8 @@ dependencies {
     implementation name: 'calcite-linq4j-1.23.0-SNAPSHOT'
     //dependency from local jar
     compile 'com.google.guava:guava:23.5-jre'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    compile 'org.slf4j:slf4j-simple:1.7.36'
 
     // Import ZetaSQL Helper client
     // JAVA_GRPC_VERSION is originally 1.18, but it will use io.opencensus which was overridden by bigquery library above.
