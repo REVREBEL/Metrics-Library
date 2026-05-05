@@ -41,7 +41,7 @@ dependencies {
     implementation name: 'calcite-core-1.23.0-SNAPSHOT'
     implementation name: 'calcite-linq4j-1.23.0-SNAPSHOT'
     //dependency from local jar
-    compile 'com.google.guava:guava:23.5-jre'
+    compile 'com.google.guava:guava:23.6.1-jre'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
     compile 'org.slf4j:slf4j-simple:1.7.36'
 
