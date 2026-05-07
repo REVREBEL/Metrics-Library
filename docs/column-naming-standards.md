@@ -1,3 +1,10 @@
+---
+title: Database Column Naming Standards
+nav_order: 2
+has_toc: true
+permalink: /column-naming-standards/
+---
+
 # Database Column Naming Standards
 
 This document defines the standard naming system for database columns across the REVREBEL Metrics Library and hotel analytics warehouse. It consolidates the Phase 1 metadata audit findings, the embedded yellow-note working conventions, and the finalized naming decisions captured during review.
@@ -721,27 +728,3 @@ Use this document to generate:
 3. a column description template library,
 4. a validation script that flags deprecated variants in schemas,
 5. a source-value mapping inventory for `_map` fields.
-
-
-
-> Test Blockquote
-
-
-
-<details> & <summary>: Create collapsible toggles.
-
-
-<sub> For subscripts.
-
-<sup>: For superscripts.
-
-<kbd>: For keyboard shortcuts (renders as a little button).
-
-
-<table>: For more advanced table formatting than standard Markdown pipes.
-
-
-
-
-
-$\color{red}{\text{This text is red}}$
