@@ -1,0 +1,41 @@
+// Custom styles for the Metrics Library GitHub Pages site.
+// Just the Docs automatically loads this file when it exists at:
+// docs/_sass/custom/custom.scss
+
+:root {
+  --rr-navy: #163666;
+  --rr-teal: #047c97;
+  --rr-bright-teal: #00a6b6;
+  --rr-mint: #71c9c5;
+  --rr-ice: #eff5f6;
+  --rr-coral: #e05047;
+}
+
+.site-title,
+.site-button,
+.nav-list .nav-list-item .nav-list-link.active {
+  color: var(--rr-navy);
+}
+
+a {
+  color: var(--rr-teal);
+}
+
+a:not([class]):hover {
+  color: var(--rr-bright-teal);
+}
+
+.main-content h1,
+.main-content h2,
+.main-content h3 {
+  color: var(--rr-navy);
+}
+
+.main-content table th {
+  background-color: var(--rr-ice);
+}
+
+.label,
+.btn-primary {
+  background-color: var(--rr-navy);
+}
