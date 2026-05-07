@@ -32,7 +32,7 @@ dependencies {
     compile 'com.google.cloud:google-cloud-bigquery:1.137.2'
     // google flogger dependencies
     compile group: 'com.google.flogger', name: 'flogger', version: '0.9'
-    compile 'com.google.flogger:flogger-system-backend:0.4'
+    compile 'com.google.flogger:flogger-system-backend:0.9'
     // CLI flag library
     compile group: 'commons-cli', name: 'commons-cli', version: '1.11.0'
 
