@@ -1,0 +1,85 @@
+config {
+  type: "operations",
+  hasOutput: false,
+  tags: ["ddl", "mappings"]
+}
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.map_segment` (
+  property_code STRING OPTIONS(description="Property code."),
+  source_system STRING OPTIONS(description="Source system."),
+  segment_map STRING OPTIONS(description="Source segment value."),
+  segment_code_map STRING OPTIONS(description="Source segment code."),
+  segment STRING OPTIONS(description="Standard segment."),
+  segment_code STRING OPTIONS(description="Standard segment code."),
+  segment_group STRING OPTIONS(description="Standard segment group."),
+  segment_group_code STRING OPTIONS(description="Standard segment group code."),
+  finance_segment STRING OPTIONS(description="Finance segment."),
+  finance_segment_code STRING OPTIONS(description="Finance segment code."),
+  gl_code STRING OPTIONS(description="General ledger or guest ledger code."),
+  segment_category STRING OPTIONS(description="Standard segment category."),
+  rate_basis STRING OPTIONS(description="Rate basis such as full rate reported, net, mixed, or discount."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Maps source segment names and codes to standardized segment values.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.map_source` (
+  property_code STRING OPTIONS(description="Property code."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_map STRING OPTIONS(description="Source value from report."),
+  source_code_map STRING OPTIONS(description="Source code from report."),
+  source STRING OPTIONS(description="Standard source."),
+  source_code STRING OPTIONS(description="Standard source code."),
+  source_group STRING OPTIONS(description="Standard source group."),
+  source_group_code STRING OPTIONS(description="Standard source group code."),
+  channel STRING OPTIONS(description="Standard channel."),
+  channel_code STRING OPTIONS(description="Standard channel code."),
+  source_category STRING OPTIONS(description="Source category."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Maps source/channel names and codes to standardized source and channel values.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.map_roomtype` (
+  property_code STRING OPTIONS(description="Property code."),
+  source_system STRING OPTIONS(description="Source system."),
+  roomtype_map STRING OPTIONS(description="Source roomtype value."),
+  roomtype_code_map STRING OPTIONS(description="Source roomtype code."),
+  roomtype STRING OPTIONS(description="Standard roomtype."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code."),
+  bedtype STRING OPTIONS(description="Standard bed type."),
+  bedtype_code STRING OPTIONS(description="Standard bed type code."),
+  roomclass STRING OPTIONS(description="Standard room class. A grouping of like room types that can be interchanged and have similar features or characteristics."),
+  roomclass_code STRING OPTIONS(description="Standard room class code."),
+  roomclass_map STRING OPTIONS(description="Source room class value."),
+  roomclass_code_map STRING OPTIONS(description="Source room class code."),
+  roomfeature STRING OPTIONS(description="Primary room feature."),
+  roompool STRING OPTIONS(description="Standard room pool, only when separately defined by the source system."),
+  roompool_code STRING OPTIONS(description="Standard room pool code, only when separately defined by the source system."),
+  roompool_map STRING OPTIONS(description="Source room pool value."),
+  roompool_code_map STRING OPTIONS(description="Source room pool code."),
+  related_roomtypes STRING OPTIONS(description="Descriptive list of related roomtypes included in the room class or pool."),
+  available_rms INT64 OPTIONS(description="Roomtype inventory, if known."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Maps source roomtype names and codes to standardized roomtype, roomclass, bedtype, and optional roompool values.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.map_source_metric` (
+  source_report_id STRING OPTIONS(description="Source report identifier."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Report name."),
+  source_column STRING OPTIONS(description="Raw source column name."),
+  standard_column STRING OPTIONS(description="Standard column name, if mapped to a wide fact field."),
+  metric_code STRING OPTIONS(description="Standard metric code."),
+  comparison STRING OPTIONS(description="Comparison period such as cy, ly, stly, st2y, st3y, st4y, bgt, fct, or act."),
+  pickup_window STRING OPTIONS(description="Pickup window such as 007, 014, 030, 060, or 090."),
+  calc_method STRING OPTIONS(description="Source, derived, or mapped."),
+  data_type STRING OPTIONS(description="Source data type."),
+  notes STRING OPTIONS(description="Mapping notes."),
+  insert_date DATE OPTIONS(description="Insert date.")
+)
+OPTIONS(description="Maps raw source report columns to standardized metric codes and columns.");
