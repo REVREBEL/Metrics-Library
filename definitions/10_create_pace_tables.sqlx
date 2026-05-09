@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   property_code STRING OPTIONS(description="Property code."),
   property_name STRING OPTIONS(description="Property name."),
   snap_date DATE OPTIONS(description="Date when the data snapshot was taken."),
-  date DATE OPTIONS(description="Stay date for which the metrics apply."),
+  stay_date DATE OPTIONS(description="Hotel stay, occupancy, or service date for which the metrics apply."),
   available_rms INT64 OPTIONS(description="Available room inventory for the property and stay date."),
   available_rms_ly INT64 OPTIONS(description="Available room inventory for the comparable prior-year stay date."),
   rms_otb INT64 OPTIONS(description="Rooms on the books for the stay date as of the snapshot date."),
@@ -51,14 +51,14 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   updated_date DATE OPTIONS(description="Updated date.")
 )
 PARTITION BY snap_date
-CLUSTER BY property_code, date
+CLUSTER BY property_code, stay_date
 OPTIONS(description="Property-level on-the-books pace snapshot metrics.");
 
 CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pace_segment` (
   property_code STRING OPTIONS(description="Property code."),
   property_name STRING OPTIONS(description="Property name."),
   snap_date DATE OPTIONS(description="Date when the data snapshot was taken."),
-  date DATE OPTIONS(description="Stay date for which the metrics apply."),
+  stay_date DATE OPTIONS(description="Hotel stay, occupancy, or service date for which the metrics apply."),
   segment STRING OPTIONS(description="Standard segment."),
   segment_code STRING OPTIONS(description="Standard segment code."),
   segment_group STRING OPTIONS(description="Standard segment group."),
@@ -96,14 +96,14 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   updated_date DATE OPTIONS(description="Updated date.")
 )
 PARTITION BY snap_date
-CLUSTER BY property_code, date, segment_code
+CLUSTER BY property_code, stay_date, segment_code
 OPTIONS(description="Segment-level on-the-books pace snapshot metrics.");
 
 CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pace_source` (
   property_code STRING OPTIONS(description="Property code."),
   property_name STRING OPTIONS(description="Property name."),
   snap_date DATE OPTIONS(description="Date when the data snapshot was taken."),
-  date DATE OPTIONS(description="Stay date for which the metrics apply."),
+  stay_date DATE OPTIONS(description="Hotel stay, occupancy, or service date for which the metrics apply."),
   source STRING OPTIONS(description="Standard source."),
   source_code STRING OPTIONS(description="Standard source code."),
   source_group STRING OPTIONS(description="Standard source group."),
@@ -137,19 +137,59 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   updated_date DATE OPTIONS(description="Updated date.")
 )
 PARTITION BY snap_date
-CLUSTER BY property_code, date, source_code
+CLUSTER BY property_code, stay_date, source_code
 OPTIONS(description="Source/channel-level on-the-books pace snapshot metrics.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pace_roomclass` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  snap_date DATE OPTIONS(description="Date when the data snapshot was taken."),
+  stay_date DATE OPTIONS(description="Hotel stay, occupancy, or service date for which the metrics apply."),
+  roomclass STRING OPTIONS(description="Standard room class. A grouping of like room types that can be interchanged and have similar features or characteristics."),
+  roomclass_code STRING OPTIONS(description="Standard room class code."),
+  roomclass_map STRING OPTIONS(description="Source room class value."),
+  roomclass_code_map STRING OPTIONS(description="Source room class code."),
+  available_rms INT64 OPTIONS(description="Available room inventory for the roomclass and stay date."),
+  rms_otb INT64 OPTIONS(description="Rooms on the books."),
+  rev_otb FLOAT64 OPTIONS(description="Room revenue on the books."),
+  rms_ly INT64 OPTIONS(description="Actual rooms for the comparable prior-year stay date."),
+  rev_ly FLOAT64 OPTIONS(description="Actual room revenue for the comparable prior-year stay date."),
+  rms_stly INT64 OPTIONS(description="Rooms on the books at same time last year."),
+  rev_stly FLOAT64 OPTIONS(description="Room revenue on the books at same time last year."),
+  rms_st2y INT64 OPTIONS(description="Rooms on the books at same time two years ago."),
+  rev_st2y FLOAT64 OPTIONS(description="Room revenue on the books at same time two years ago."),
+  rms_st3y INT64 OPTIONS(description="Rooms on the books at same time three years ago."),
+  rev_st3y FLOAT64 OPTIONS(description="Room revenue on the books at same time three years ago."),
+  rms_st4y INT64 OPTIONS(description="Rooms on the books at same time four years ago."),
+  rev_st4y FLOAT64 OPTIONS(description="Room revenue on the books at same time four years ago."),
+  rms_fct INT64 OPTIONS(description="Forecasted rooms."),
+  rev_fct FLOAT64 OPTIONS(description="Forecasted room revenue."),
+  adr_fct FLOAT64 OPTIONS(description="Forecasted ADR."),
+  cx_rms INT64 OPTIONS(description="Cancelled rooms."),
+  cx_rms_ly INT64 OPTIONS(description="Cancelled rooms for the comparable prior-year stay date."),
+  ns_rms INT64 OPTIONS(description="No-show rooms."),
+  ns_rms_ly INT64 OPTIONS(description="No-show rooms for the comparable prior-year stay date."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY snap_date
+CLUSTER BY property_code, stay_date, roomclass_code
+OPTIONS(description="Roomclass-level on-the-books pace snapshot metrics. Roomclass is a grouping of like room types that can be interchanged and have similar features or characteristics.");
 
 CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pace_roomtype` (
   property_code STRING OPTIONS(description="Property code."),
   property_name STRING OPTIONS(description="Property name."),
   snap_date DATE OPTIONS(description="Date when the data snapshot was taken."),
-  date DATE OPTIONS(description="Stay date for which the metrics apply."),
+  stay_date DATE OPTIONS(description="Hotel stay, occupancy, or service date for which the metrics apply."),
   roomtype STRING OPTIONS(description="Standard roomtype."),
   roomtype_code STRING OPTIONS(description="Standard roomtype code."),
   bedtype STRING OPTIONS(description="Standard bed type."),
   bedtype_code STRING OPTIONS(description="Standard bed type code."),
-  roomclass STRING OPTIONS(description="Room class."),
+  roomclass STRING OPTIONS(description="Room class. A grouping of like room types that can be interchanged and have similar features or characteristics."),
+  roomclass_code STRING OPTIONS(description="Standard room class code."),
   roomfeature STRING OPTIONS(description="Primary room feature."),
   roompool STRING OPTIONS(description="Standard room pool."),
   roompool_code STRING OPTIONS(description="Standard room pool code."),
@@ -182,5 +222,5 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   updated_date DATE OPTIONS(description="Updated date.")
 )
 PARTITION BY snap_date
-CLUSTER BY property_code, date, roomtype_code
+CLUSTER BY property_code, stay_date, roomtype_code
 OPTIONS(description="Roomtype-level on-the-books pace snapshot metrics.");
