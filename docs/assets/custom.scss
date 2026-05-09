@@ -1,0 +1,266 @@
+/* Import Khand, Poppins, and Roboto from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Khand:wght@300;400;500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+}
+
+body {
+    /* Main body font: Poppins with Roboto as fallbacks */
+    font-family: "Roboto", helvetica, arial, sans-serif;
+    font-weight: 300;    
+    font-size: 16px;
+    color: #163666;
+    line-height: 1.4em;
+    background-color: #FAFAFA;
+    padding: 0.7em;
+}
+
+p {
+    margin: 0.5em 0; /* Reduced margin to tighten space after headers */
+    line-height: 1.5em;
+}
+
+table {
+    font-size: inherit;
+    font: 100%;
+    margin: 1em;
+}
+
+table th {
+    /* Table headers: Uppercase, Khand, Weight 700 (max available) */
+    font-family: "Khand", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 1px solid #163666;
+    padding: .2em 1em;
+    color: #163666;
+    text-align: left;
+}
+
+table td {
+    border-bottom: 1px solid #ddd;
+    padding: .2em 1em;
+}
+
+input[type=text],
+input[type=password],
+input[type=image],
+textarea {
+    font-family: "Poppins", helvetica, arial, sans-serif;
+    font-size: 99%;
+}
+
+select,
+option {
+    padding: 0 .25em;
+}
+
+optgroup {
+    margin-top: .5em;
+}
+
+pre,
+code {
+    font-family: "Poppins", "Roboto", helvetica, arial, sans-serif;
+}
+
+pre {
+    margin: 1em 0;
+    font-size: 16px;
+    /* Entire code block container is now dark blue */
+    background-color: #163666;
+    border: 1px solid #163666;
+    padding: 10px;
+    line-height: 1.5em;
+    color: #EFF5F6;
+    overflow: auto;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.07) 0 1px 2px inset;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+pre code {
+    padding: 0;
+    font-family: "Poppins", "Roboto", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #EFF5F6;
+    background-color: transparent; /* Inherits container color */
+    border: none;
+}
+
+code {
+    /* Inline code style */
+    font-family: "Khand", "Poppins", "Roboto", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #163666;
+    background-color: #EFF5F6;
+    padding: 0 .2em;
+    border: 1px solid #EFF5F6;
+}
+
+img {
+    border: 0;
+    max-width: 100%;
+}
+
+abbr {
+    border-bottom: none;
+}
+
+a {
+    color: #00A6B6;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a code,
+a:link code,
+a:visited code {
+    color: #047C97;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #163666;
+    font-family: "Khand", "Roboto", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 0;
+    margin-bottom: 0.2em; /* Decreased space to next line */
+}
+
+h1 {
+    font-size: 370%;
+    line-height: 1;
+    border-top: 4px solid #aaa;
+    padding-top: .5em;
+    margin-top: 3.5em; /* Section spacing */
+}
+
+h1:first-child {
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 0;
+    padding-top: .25em;
+    border-top: none;
+}
+
+h2 {
+    font-size: 250%;
+    line-height: 1;
+    margin-top: 3em; /* Section spacing */
+    border-top: 4px solid #e0e0e0;
+    padding-top: .5em;
+}
+
+h3 {
+    margin-top: 2.5em; /* Spacing for sub-sections */
+    letter-spacing: .115em;
+}
+
+/* Logic to prevent double-spacing if a header follows another header */
+h1 + h2, h2 + h3, h1 + h3, h3 + h2, h2 + h1, h1 + h1, h2 + h2, h3 + h3 {
+    margin-top: 0.5em !important;
+}
+
+hr {
+    /* Increased margin around horizontal rules (line breaks) by roughly 30px */
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 3em 0; 
+}
+
+ul,
+ol {
+    margin: 1em 0 1em 2em;
+}
+
+ul li,
+ol li {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+blockquote {
+    margin: 3em 2em 3em 2em;
+    border-left: 5px solid #047C97;
+    line-height: 1.5;
+    padding: .15em 0em .15em 1em;
+    
+    font-weight: 300;
+    color: #00A6B6;
+    text-transform: lowercase;
+    font-family: "Poppins", "Roboto", sans-serif;
+}
+
+dt {
+    font-weight: bold;
+    margin-left: 1em;
+}
+
+dd {
+    margin-left: 2em;
+    margin-bottom: 1em;
+}
+
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+
+kbd {
+    display: inline-block;
+    padding: 3px 5px;
+    font-size: 11px;
+    line-height: 10px;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fcfcfc;
+    border: solid 1px #ccc;
+    border-bottom-color: #bbb;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #bbb;
+}
+
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin: 0 auto;
+    }
+}
+
+@media print {
+    table,
+    pre {
+        page-break-inside: avoid;
+    }
+    pre {
+        word-wrap: break-word;
+    }
+    body {
+        padding: 2cm;
+    }
+}
