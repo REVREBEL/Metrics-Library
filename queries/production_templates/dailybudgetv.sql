@@ -1,0 +1,52 @@
+DECLARE project_id STRING DEFAULT 'your-production-project';
+DECLARE dataset_name STRING DEFAULT 'prod_hotel_analytics';
+DECLARE table_name STRING DEFAULT 'dailybudgetv';
+
+EXECUTE IMMEDIATE FORMAT("""
+  CREATE OR REPLACE TABLE `%s.%s.%s` (
+    from ( OPTIONS(description='Standardized from.'),
+    from base OPTIONS(description='Standardized from.'),
+    where row OPTIONS(description='Standardized where.'),
+    from latest OPTIONS(description='Standardized from.'),
+    select property OPTIONS(description='Standardized select.'),
+    case WHEN OPTIONS(description='Standardized case.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    end AS OPTIONS(description='Standardized end.'),
+    value AS OPTIONS(description='Standardized value.'),
+    is_leap_year FROM OPTIONS(description='Standardized is_leap_year.'),
+    unpivot ( OPTIONS(description='Standardized unpivot.'),
+    value FOR OPTIONS(description='Standardized value.'),
+    case WHEN OPTIONS(description='Standardized case.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    when month OPTIONS(description='Standardized when.'),
+    end AS OPTIONS(description='Standardized end.'),
+    from unpivoted OPTIONS(description='Standardized from.'),
+    select property OPTIONS(description='Standardized select.'),
+    from month OPTIONS(description='Standardized from.'),
+    select DISTINCT OPTIONS(description='Standardized select.'),
+    select DISTINCT OPTIONS(description='Standardized select.'),
+    select DISTINCT OPTIONS(description='Standardized select.'),
+    select p OPTIONS(description='Standardized select.'),
+    from properties OPTIONS(description='Standardized from.'),
+    cross JOIN OPTIONS(description='Standardized cross.'),
+    cross JOIN OPTIONS(description='Standardized cross.'),
+    select fg OPTIONS(description='Standardized select.'),
+    from full OPTIONS(description='Standardized from.'),
+    left JOIN OPTIONS(description='Standardized left.'),
+    on fg OPTIONS(description='Standardized on.'),
+    and fg OPTIONS(description='Standardized and.'),
+    and fg OPTIONS(description='Standardized and.'),
+    from filled OPTIONS(description='Standardized from.')
+  )
+""", project_id, dataset_name, table_name);
