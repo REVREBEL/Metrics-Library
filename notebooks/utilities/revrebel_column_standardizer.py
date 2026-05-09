@@ -7,13 +7,14 @@ Purpose:
 - normalize raw source headers into safe snake_case
 - rename known source columns to REVREBEL standard names
 - add required ingestion metadata columns
+- print before/after column mapping reports
 - keep source-specific mapping logic out of one-off notebooks
 
 Example:
 
-    from revrebel_column_standardizer import standardize_dataframe
+    from revrebel_column_standardizer import standardize_dataframe, print_column_report
 
-    df = standardize_dataframe(
+    df_standardized = standardize_dataframe(
         df,
         source_report="snap_pace_segment",
         metadata={
@@ -22,6 +23,8 @@ Example:
             "source_file": file_path.name,
         }
     )
+
+    print_column_report(df, df_standardized, source_report="snap_pace_segment")
 """
 
 from __future__ import annotations
@@ -207,6 +210,62 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
 }
 
 
+def build_rename_map(
+    columns: list[Any],
+    source_report: Optional[str] = None,
+    extra_map: Optional[Mapping[str, str]] = None,
+) -> Dict[str, str]:
+    """Build the actual rename map for a list of source columns."""
+    normalized_columns = [normalize_header(col) for col in columns]
+
+    rename_map: Dict[str, str] = dict(COMMON_COLUMN_MAP)
+    if source_report and source_report in REPORT_COLUMN_MAPS:
+        rename_map.update(REPORT_COLUMN_MAPS[source_report])
+    if extra_map:
+        rename_map.update({normalize_header(k): v for k, v in extra_map.items()})
+
+    return {
+        source_col: rename_map[source_col]
+        for source_col in normalized_columns
+        if source_col in rename_map
+    }
+
+
+def get_column_report(
+    df: pd.DataFrame,
+    source_report: Optional[str] = None,
+    extra_map: Optional[Mapping[str, str]] = None,
+) -> pd.DataFrame:
+    """Return a before/after column-standardization report."""
+    original_columns = list(df.columns)
+    normalized_columns = [normalize_header(col) for col in original_columns]
+    rename_map = build_rename_map(original_columns, source_report=source_report, extra_map=extra_map)
+
+    rows = []
+    for original_col, normalized_col in zip(original_columns, normalized_columns):
+        standard_col = rename_map.get(normalized_col, normalized_col)
+        rows.append(
+            {
+                "original_column": original_col,
+                "normalized_column": normalized_col,
+                "standard_column": standard_col,
+                "changed": standard_col != normalized_col,
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
+def print_column_report(
+    df: pd.DataFrame,
+    source_report: Optional[str] = None,
+    extra_map: Optional[Mapping[str, str]] = None,
+) -> None:
+    """Print the before/after column-standardization report."""
+    report = get_column_report(df, source_report=source_report, extra_map=extra_map)
+    print(report.to_string(index=False))
+
+
 def standardize_columns(
     df: pd.DataFrame,
     source_report: Optional[str] = None,
@@ -216,18 +275,8 @@ def standardize_columns(
     output = df.copy()
     output.columns = [normalize_header(col) for col in output.columns]
 
-    rename_map: Dict[str, str] = dict(COMMON_COLUMN_MAP)
-    if source_report and source_report in REPORT_COLUMN_MAPS:
-        rename_map.update(REPORT_COLUMN_MAPS[source_report])
-    if extra_map:
-        rename_map.update({normalize_header(k): v for k, v in extra_map.items()})
-
-    existing_rename_map = {
-        source_col: standard_col
-        for source_col, standard_col in rename_map.items()
-        if source_col in output.columns
-    }
-    return output.rename(columns=existing_rename_map)
+    rename_map = build_rename_map(list(df.columns), source_report=source_report, extra_map=extra_map)
+    return output.rename(columns=rename_map)
 
 
 def add_ingestion_metadata(
@@ -258,8 +307,12 @@ def standardize_dataframe(
     source_report: Optional[str] = None,
     metadata: Optional[Mapping[str, Any]] = None,
     extra_map: Optional[Mapping[str, str]] = None,
+    print_report: bool = False,
 ) -> pd.DataFrame:
     """Apply column normalization, standard naming, and ingestion metadata."""
+    if print_report:
+        print_column_report(df, source_report=source_report, extra_map=extra_map)
+
     output = standardize_columns(df, source_report=source_report, extra_map=extra_map)
     output = add_ingestion_metadata(output, metadata=metadata)
     return output
