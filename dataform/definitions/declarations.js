@@ -1,20 +1,20 @@
   declare({
-    database: "devrebel-big-query-database",
-    schema: "Pace",
-    name: "Pace_SegmentV",
+    database: "revrebel-metrics",
+    schema: "metrics_pace",
+    name: "fact_pace_property",
   });
     declare({
-    database: "devrebel-big-query-database",
-    schema: "Pace",
-    name: "Pace_SegmentV_LatestSnapshotV",
+    database: "revrebel-metrics",
+    schema: "metrics_pace",
+    name: "fact_pace_roomclass",
   });
     declare({
-    database: "devrebel-big-query-database",
-    schema: "Pace",
-    name: "Pace_RoomTypeV",
+    database: "revrebel-metrics",
+    schema: "metrics_pace",
+    name: "fact_pace_roomtype",
   });
     declare({
-    database: "devrebel-big-query-database",
-    schema: "Pace",
-    name: "Pace_RoomTypeV_LatestSnapshotV",
+    database: "drevrebel-metrics",
+    schema: "metrics_pace",
+    name: "fact_pace_segment",
   });
