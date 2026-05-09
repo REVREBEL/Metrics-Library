@@ -9,22 +9,6 @@ Purpose:
 - add required ingestion metadata columns
 - print before/after column mapping reports
 - keep source-specific mapping logic out of one-off notebooks
-
-Example:
-
-    from revrebel_column_standardizer import standardize_dataframe, print_column_report
-
-    df_standardized = standardize_dataframe(
-        df,
-        source_report="snap_pace_segment",
-        metadata={
-            "property_code": "DTWDFH",
-            "source_system": "Duetto",
-            "source_file": file_path.name,
-        }
-    )
-
-    print_column_report(df, df_standardized, source_report="snap_pace_segment")
 """
 
 from __future__ import annotations
@@ -49,55 +33,169 @@ def normalize_header(value: Any) -> str:
 COMMON_COLUMN_MAP: Dict[str, str] = {
     # Dates / metadata
     "snapshot_date": "snap_date",
+    "snap_date": "snap_date",
     "stay_date": "date",
     "business_date": "date",
+    "occupancy_date": "date",
+    "date": "date",
     "arrival_date": "arrival_date",
     "departure_date": "departure_date",
+    "comparison_date_last_year": "comparison_date_ly",
     "etl_date": "etl_date",
 
     # Property
     "hotel": "property_name",
     "hotel_name": "property_name",
     "property": "property_name",
+    "property_name": "property_name",
     "property_id": "property_code",
+    "property_code": "property_code",
 
-    # Rooms / revenue / pace
+    # Base rooms / revenue / inventory
     "rooms": "rms",
     "room_nights": "rms",
     "room_nights_sold": "rms",
     "rooms_sold": "rms",
+    "available_rooms": "available_rms",
+    "available_rooms_ly": "available_rms_ly",
+    "physical_capacity": "available_rms",
+    "physical_capacity_this_year": "available_rms",
+    "physical_capacity_last_year_actual": "available_rms_ly",
+    "capacity_this_year": "available_rms",
+    "capacity_last_year_actual": "available_rms_ly",
+    "remaining_capacity_this_year": "remaining_rms",
+    "remaining_capacity_last_year_actual": "remaining_rms_ly",
+
+    # Pace rooms
     "rooms_otb": "rms_otb",
     "rooms_on_the_books": "rms_otb",
+    "occupancy_on_books_this_year": "rms_otb",
+    "occupancy_on_books_last_year_actual": "rms_ly",
+    "occupancy_on_books_stly": "rms_stly",
+    "occupancy_on_books_st2y": "rms_st2y",
+    "rooms_ly_actual": "rms_ly",
+    "rooms_stly": "rms_stly",
+    "rooms_st2y": "rms_st2y",
+    "rooms_st3y": "rms_st3y",
+    "rooms_st4y": "rms_st4y",
+
+    # Group / transient rooms sold from property pace exports
+    "rooms_sold_group_this_year": "group_rms_otb",
+    "rooms_sold_group_last_year_actual": "group_rms_ly",
+    "rooms_sold_group_stly": "group_rms_stly",
+    "rooms_sold_group_st2y": "group_rms_st2y",
+    "rooms_sold_transient_this_year": "transient_rms_otb",
+    "rooms_sold_transient_last_year_actual": "transient_rms_ly",
+    "rooms_sold_transient_stly": "transient_rms_stly",
+    "rooms_sold_transient_st2y": "transient_rms_st2y",
+
+    # Revenue
+    "revenue": "rev",
     "revenue_otb": "rev_otb",
     "rev_otb": "rev_otb",
-    "rooms_stly": "rms_stly",
-    "rev_stly": "rev_stly",
-    "rooms_st2y": "rms_st2y",
-    "rev_st2y": "rev_st2y",
-    "rooms_st3y": "rms_st3y",
-    "rev_st3y": "rev_st3y",
-    "rooms_st4y": "rms_st4y",
-    "rev_st4y": "rev_st4y",
-    "rooms_ly_actual": "rms_ly",
+    "booked_room_revenue_this_year": "rev_otb",
+    "booked_room_revenue_last_year_actual": "rev_ly",
+    "booked_room_revenue_stly": "rev_stly",
+    "booked_room_revenue_st2y": "rev_st2y",
     "rev_ly_actual": "rev_ly",
+    "rev_stly": "rev_stly",
+    "rev_st2y": "rev_st2y",
+    "rev_st3y": "rev_st3y",
+    "rev_st4y": "rev_st4y",
+    "forecasted_room_revenue_this_year": "rev_fct",
+    "forecasted_room_revenue_last_year_actual": "rev_fct_ly",
+    "property_forecast_revenue_this_year": "property_rev_fct",
+    "property_forecast_revenue_last_year_actual": "property_rev_fct_ly",
+    "budget_room_revenue_this_year": "rev_bgt",
+    "budget_room_revenue_last_year_actual": "rev_bgt_ly",
+    "budget_revenue_this_year": "rev_bgt",
+    "budget_revenue_last_year_actual": "rev_bgt_ly",
     "rooms_forecast": "rms_fct",
     "rev_forecast": "rev_fct",
     "rooms_budget": "rms_bgt",
     "rev_budget": "rev_bgt",
-    "available_rooms": "available_rms",
-    "available_rooms_ly": "available_rms_ly",
 
-    # Cancellations / no-shows / OOO
+    # Forecast / budget occupancy counts from Duetto property/segment exports
+    "occupancy_forecast_total_this_year": "rms_fct",
+    "occupancy_forecast_total_last_year_actual": "rms_fct_ly",
+    "occupancy_forecast_this_year": "rms_fct",
+    "occupancy_forecast_last_year_actual": "rms_fct_ly",
+    "property_forecast_occupancy_total_this_year": "property_rms_fct",
+    "property_forecast_occupancy_total_last_year_actual": "property_rms_fct_ly",
+    "budget_occupancy_total_this_year": "rms_bgt",
+    "budget_occupancy_total_last_year_actual": "rms_bgt_ly",
+    "occupancy_forecast_group_this_year": "group_rms_fct",
+    "occupancy_forecast_group_last_year_actual": "group_rms_fct_ly",
+    "occupancy_forecast_transient_this_year": "transient_rms_fct",
+    "occupancy_forecast_transient_last_year_actual": "transient_rms_fct_ly",
+
+    # Demand
+    "system_total_demand_total_this_year": "system_demand_total",
+    "system_total_demand_total_last_year_actual": "system_demand_total_ly",
+    "system_total_demand_group_this_year": "system_demand_group",
+    "system_total_demand_group_last_year_actual": "system_demand_group_ly",
+    "system_total_demand_transient_this_year": "system_demand_transient",
+    "system_total_demand_transient_last_year_actual": "system_demand_transient_ly",
+    "user_total_demand_total_this_year": "user_demand_total",
+    "user_total_demand_total_last_year_actual": "user_demand_total_ly",
+    "user_constrained_total_demand_group_this_year": "user_constrained_demand_group",
+    "user_constrained_total_demand_group_last_year_actual": "user_constrained_demand_group_ly",
+    "user_unconstrained_total_demand_transient_this_year": "user_unconstrained_demand_transient",
+    "user_unconstrained_total_demand_transient_last_year_actual": "user_unconstrained_demand_transient_ly",
+    "total_demand_total": "demand_total",
+    "total_demand_total_ly_actual": "demand_total_ly",
+    "group_demand_total": "demand_group",
+    "group_demand_total_ly_actual": "demand_group_ly",
+    "transient_demand_total": "demand_transient",
+    "transient_demand_total_ly_actual": "demand_transient_ly",
+
+    # Arrivals / departures / cancellations / no-shows / OOO
+    "arrivals_this_year": "arrival_rms",
+    "arrivals_last_year_actual": "arrival_rms_ly",
+    "departures_this_year": "departure_rms",
+    "departures_last_year_actual": "departure_rms_ly",
+    "cancelled_this_year": "cx_rms",
+    "cancelled_last_year_actual": "cx_rms_ly",
     "cancelled_rooms": "cx_rms",
     "cancelled_rooms_ly_actual": "cx_rms_ly",
     "canceled_rooms": "cx_rms",
     "canceled_rooms_ly_actual": "cx_rms_ly",
+    "no_show_this_year": "ns_rms",
+    "no_show_last_year_actual": "ns_rms_ly",
     "noshow_rooms": "ns_rms",
     "no_show_rooms": "ns_rms",
     "noshow_rooms_ly_actual": "ns_rms_ly",
     "no_show_rooms_ly_actual": "ns_rms_ly",
+    "rooms_n_a_out_of_order_this_year": "ooo_rms",
+    "rooms_n_a_out_of_order_last_year_actual": "ooo_rms_ly",
+    "rooms_n_a_other_this_year": "na_other_rms",
+    "rooms_n_a_other_last_year_actual": "na_other_rms_ly",
     "ooo_rooms": "ooo_rms",
     "out_of_order_rooms": "ooo_rms",
+    "overbooking_this_year": "overbook_rms",
+    "overbooking_last_year_actual": "overbook_rms_ly",
+
+    # Calculated/source rate metrics
+    "adr_on_books_this_year": "adr_otb",
+    "adr_on_books_last_year_actual": "adr_ly",
+    "adr_forecast_this_year": "adr_fct",
+    "adr_forecast_last_year_actual": "adr_fct_ly",
+    "revpar_on_books_this_year": "revpar_otb",
+    "revpar_on_books_last_year_actual": "revpar_ly",
+    "revpar_forecast_this_year": "revpar_fct",
+    "revpar_forecast_last_year_actual": "revpar_fct_ly",
+    "last_room_value_this_year": "lrv",
+    "last_room_value_last_year_actual": "lrv_ly",
+    "wash_this_year": "wash_pct",
+    "wash_last_year_actual": "wash_pct_ly",
+    "wash_pct_ly_actual": "wash_pct_ly",
+    "bar": "bar_price",
+    "bar_this_year": "bar_price",
+    "bar_last_year_actual": "bar_price_ly",
+
+    # Events - events should ultimately live in dim_event / bridge_property_event_date.
+    "special_event_this_year": "primary_event",
+    "special_event_last_year_actual": "primary_event_ly",
 
     # Demand / compset
     "compset_rooms_sold": "cs_rms_sold",
@@ -119,6 +217,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "room_nights_chg_pct_from_last_wk_market_excl_totals": "market_excl_rms_pct_chg_lw",
 
     # Segment / source / channel
+    "business_view": "segment",
     "market_code": "segment_code",
     "market_segment": "market_segment",
     "detail": "segment_detail",
@@ -127,8 +226,10 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
     # Room type
     "room_type": "roomtype",
+    "roomtype": "roomtype",
     "room_type_code": "roomtype_code",
     "room_class": "roomclass",
+    "roomclass": "roomclass",
     "room_class_code": "roomclass_code",
     "bed_type": "bedtype",
     "bed_type_code": "bedtype_code",
@@ -170,22 +271,16 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
         "stly_date_room_revenue_commit": "rev_stly",
         "st2y_date_rooms_commit": "rms_st2y",
         "st2y_date_room_revenue_commit": "rev_st2y",
+        "business_view": "segment",
     },
     "snap_pace_roomtype": {
         **COMMON_COLUMN_MAP,
-        "room_type": "roomtype",
-        "room_type_code": "roomtype_code",
         "physical_capacity": "available_rms",
+        "capacity_this_year": "available_rms",
+        "capacity_last_year_actual": "available_rms_ly",
     },
     "snap_property": {
         **COMMON_COLUMN_MAP,
-        "total_demand_total": "demand_total",
-        "total_demand_total_ly_actual": "demand_total_ly",
-        "group_demand_total": "demand_group",
-        "group_demand_total_ly_actual": "demand_group_ly",
-        "transient_demand_total": "demand_transient",
-        "transient_demand_total_ly_actual": "demand_transient_ly",
-        "wash_pct_ly_actual": "wash_pct_ly",
     },
     "snap_demand_property": COMMON_COLUMN_MAP,
     "snap_demand_segment": COMMON_COLUMN_MAP,
@@ -250,6 +345,7 @@ def get_column_report(
                 "normalized_column": normalized_col,
                 "standard_column": standard_col,
                 "changed": standard_col != normalized_col,
+                "mapped": normalized_col in rename_map,
             }
         )
 
