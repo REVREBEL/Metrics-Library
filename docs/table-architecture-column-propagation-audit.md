@@ -19,6 +19,7 @@ The affected areas are:
 2. Segment grouping / finance mapping fields
 3. Source grouping fields
 4. Roomtype detail fields
+5. Room pool / related-roomtype grouping fields
 
 ## Propagation Rules
 
@@ -38,7 +39,9 @@ Examples:
 
 ### Fields that should propagate
 
-If a field changes how data is grouped, mapped, or interpreted, it should be available in the matching mapping table and/or fact grain.
+If a field changes how data is grouped, mapped, modeled, priced, or interpreted, it should be available in the matching mapping table and/or fact grain.
+
+Room pool fields fall into this category because they support price sensitivity, room demand, upgrade/downgrade behavior, sell-through analysis, and demand calculations across related room types.
 
 ## Findings
 
@@ -98,12 +101,47 @@ Needs propagation.
 |---|---:|---:|---:|---|
 | `bedtype` | Yes | No | No | Add to `map_roomtype`, `fact_pace_roomtype`, `fact_actual_roomtype`, and `fact_pickup_roomtype`. |
 | `bedtype_code` | Yes | No | No | Add to `map_roomtype`, `fact_pace_roomtype`, `fact_actual_roomtype`, and `fact_pickup_roomtype`. |
-| `roomfeature` | Yes | No | No | Add to `map_roomtype`; optional in facts, useful in marts. |
-| `related_roomtypes` | Yes | No | No | Keep mainly in `dim_roomtype`; optional in `map_roomtype`. Not required in facts. |
+| `roomfeature` | Yes | No | No | Add to `map_roomtype`, `fact_pace_roomtype`, `fact_actual_roomtype`, and `fact_pickup_roomtype`. |
+| `related_roomtypes` | Yes | No | No | Replace as a core analysis field with `roompool` / `roompool_code`; keep `related_roomtypes` as descriptive/reference metadata if needed. |
 
 ### Status
 
 Needs propagation.
+
+## 5. Room pool / related-roomtype modeling
+
+`related_roomtypes` is analytically important for room pools, price sensitivity, demand calculations, and inventory/product grouping. However, a free-form `related_roomtypes` field is not ideal as the primary fact-table grouping key.
+
+The recommended standard is to model room pools explicitly using:
+
+```text
+roompool
+roompool_code
+```
+
+Use `related_roomtypes` as supporting metadata that describes which room types are grouped together, but use `roompool` and `roompool_code` as the actual analytical grain fields.
+
+### Recommended room pool fields
+
+| Field | Purpose |
+|---|---|
+| `roompool` | Standard room pool name used for analysis. |
+| `roompool_code` | Standard room pool code used for joins, filtering, and BI grouping. |
+| `roompool_map` | Source-system room pool or related-roomtype value, if provided. |
+| `roompool_code_map` | Source-system room pool code, if provided. |
+| `related_roomtypes` | Descriptive list of roomtypes included in the pool. Useful for documentation, not ideal as the primary join key. |
+
+### Why this should propagate
+
+Room pools are used to answer questions like:
+
+1. Which related room products are showing pricing sensitivity?
+2. Is demand shifting between bed types, views, premium tiers, or accessible variants?
+3. Are room types within the same sellable pool behaving differently by ADR or pickup?
+4. Should pricing or restrictions be adjusted at roomtype level or pool level?
+5. Are upgrades, substitutions, or inventory constraints distorting roomtype-level demand?
+
+Because of this, `roompool` and `roompool_code` should be available in roomtype mapping and roomtype fact tables.
 
 ## Recommended Updates
 
@@ -189,6 +227,21 @@ source_group
 source_group_code
 ```
 
+## `dim_roomtype`
+
+Add:
+
+```text
+roompool
+roompool_code
+```
+
+Keep:
+
+```text
+related_roomtypes
+```
+
 ## `map_roomtype`
 
 Add:
@@ -197,6 +250,10 @@ Add:
 bedtype
 bedtype_code
 roomfeature
+roompool
+roompool_code
+roompool_map
+roompool_code_map
 related_roomtypes
 ```
 
@@ -208,6 +265,8 @@ Add:
 bedtype
 bedtype_code
 roomfeature
+roompool
+roompool_code
 ```
 
 ## `fact_actual_roomtype`
@@ -218,6 +277,8 @@ Add:
 bedtype
 bedtype_code
 roomfeature
+roompool
+roompool_code
 ```
 
 ## `fact_pickup_roomtype`
@@ -228,7 +289,29 @@ Add:
 bedtype
 bedtype_code
 roomfeature
+roompool
+roompool_code
 ```
+
+## BI mart recommendation
+
+Roomtype marts should include both roomtype-level and roompool-level fields.
+
+Add to `mart_roomtype_daily`:
+
+```text
+roompool
+roompool_code
+roompool_available_rms
+roompool_rms_otb
+roompool_rev_otb
+roompool_adr_otb
+roompool_occ_otb
+roompool_rms_pickup
+roompool_rev_pickup
+```
+
+The `roompool_*` metrics may be calculated in the mart by aggregating roomtype facts across `roompool_code`.
 
 ## Notes
 
