@@ -1,0 +1,163 @@
+config {
+  type: "operations",
+  hasOutput: false,
+  tags: ["ddl", "core", "dimensions"]
+}
+
+CREATE SCHEMA IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}`
+OPTIONS(location="${dataform.projectConfig.defaultLocation}");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_property` (
+  property_code STRING OPTIONS(description="Primary property code."),
+  property_name STRING OPTIONS(description="Standard property name."),
+  property_shortname STRING OPTIONS(description="Short property name used for BI display."),
+  property_status STRING OPTIONS(description="Property status such as Active, Inactive, Onboarding, or Archived."),
+  rating STRING OPTIONS(description="Property rating or star rating."),
+  brand STRING OPTIONS(description="Brand or collection."),
+  market STRING OPTIONS(description="Primary market."),
+  city STRING OPTIONS(description="City."),
+  state STRING OPTIONS(description="State or province."),
+  country STRING OPTIONS(description="Country."),
+  timezone STRING OPTIONS(description="IANA timezone."),
+  str_id STRING OPTIONS(description="Standard STR / CoStar identifier."),
+  crs_id STRING OPTIONS(description="CRS identifier."),
+  pms_id STRING OPTIONS(description="PMS identifier."),
+  rateshop_id STRING OPTIONS(description="Rate shop identifier."),
+  available_rms INT64 OPTIONS(description="Default room inventory, if stable."),
+  open_date DATE OPTIONS(description="Property open date."),
+  close_date DATE OPTIONS(description="Property close date, if applicable."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Standard property/hotel reference table.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_date` (
+  date DATE OPTIONS(description="Primary date."),
+  date_key INT64 OPTIONS(description="YYYYMMDD date key."),
+  year INT64 OPTIONS(description="Calendar year."),
+  quarter INT64 OPTIONS(description="Calendar quarter."),
+  month INT64 OPTIONS(description="Calendar month number."),
+  month_name STRING OPTIONS(description="Month name."),
+  week INT64 OPTIONS(description="Week number."),
+  day_of_week STRING OPTIONS(description="Day of week name."),
+  day_of_week_no INT64 OPTIONS(description="Day of week number."),
+  is_weekend BOOL OPTIONS(description="Weekend flag.")
+)
+OPTIONS(description="Calendar/date dimension.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_segment` (
+  segment STRING OPTIONS(description="Standard segment name."),
+  segment_code STRING OPTIONS(description="Standard segment code."),
+  segment_group STRING OPTIONS(description="Standard segment group name."),
+  segment_group_code STRING OPTIONS(description="Standard segment group code."),
+  finance_segment STRING OPTIONS(description="Finance segment name."),
+  finance_segment_code STRING OPTIONS(description="Finance segment code."),
+  gl_code STRING OPTIONS(description="General ledger or guest ledger code."),
+  segment_category STRING OPTIONS(description="Segment category such as Group, Transient, Contract, or Complimentary."),
+  rate_basis STRING OPTIONS(description="Rate basis such as full rate reported, net, mixed, or discount."),
+  segment_sort INT64 OPTIONS(description="BI sort order."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Standard segment reference table.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_source` (
+  source STRING OPTIONS(description="Standard source name."),
+  source_code STRING OPTIONS(description="Standard source code."),
+  source_group STRING OPTIONS(description="Standard source group."),
+  source_group_code STRING OPTIONS(description="Standard source group code."),
+  channel STRING OPTIONS(description="Standard channel name."),
+  channel_code STRING OPTIONS(description="Standard channel code."),
+  source_category STRING OPTIONS(description="Source category such as Direct, OTA, GDS, Wholesale, Brand, or Voice."),
+  source_sort INT64 OPTIONS(description="BI sort order."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Standard source/channel reference table.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_roomtype` (
+  property_code STRING OPTIONS(description="Property code."),
+  roomtype STRING OPTIONS(description="Standard roomtype name."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code."),
+  bedtype STRING OPTIONS(description="Standard bed type."),
+  bedtype_code STRING OPTIONS(description="Standard bed type code."),
+  roomclass STRING OPTIONS(description="Room class or category."),
+  roomfeature STRING OPTIONS(description="Primary room feature such as size, view, floor, or amenity."),
+  roompool STRING OPTIONS(description="Standard room pool name used for room demand and price sensitivity analysis."),
+  roompool_code STRING OPTIONS(description="Standard room pool code."),
+  related_roomtypes STRING OPTIONS(description="Descriptive list of related roomtypes included in the room pool."),
+  available_rms INT64 OPTIONS(description="Default room inventory for the roomtype, if stable."),
+  roomtype_sort INT64 OPTIONS(description="BI sort order."),
+  is_active BOOL OPTIONS(description="Active flag."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Standard room type, room class, bed type, and room pool reference table.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_metric` (
+  metric_code STRING OPTIONS(description="Standard metric code."),
+  metric_name STRING OPTIONS(description="Display name."),
+  metric_category STRING OPTIONS(description="Metric category such as Revenue, Rooms, Rate, Occupancy, Demand, or Pickup."),
+  metric_type STRING OPTIONS(description="Metric type such as Count, Currency, Percent, Ratio, or Text."),
+  is_additive BOOL OPTIONS(description="Whether the metric can be summed."),
+  calc_method STRING OPTIONS(description="Source, derived, mapped, or manual."),
+  formula STRING OPTIONS(description="Formula for derived metrics."),
+  display_format STRING OPTIONS(description="BI display format."),
+  description STRING OPTIONS(description="Metric definition."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Metric dictionary and calculation rules.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_source_report` (
+  source_report_id STRING OPTIONS(description="Unique source report identifier."),
+  source_system STRING OPTIONS(description="PMS, RMS, CRS, booking engine, manual, or other source system."),
+  source_report STRING OPTIONS(description="Source report name."),
+  source_file STRING OPTIONS(description="Source file name or path."),
+  property_code STRING OPTIONS(description="Property code, if report is property-specific."),
+  report_grain STRING OPTIONS(description="Property, segment, source, roomtype, mixed, or unknown."),
+  report_type STRING OPTIONS(description="Pace, actual, pickup, forecast, budget, mapping, demand, pricing, event, or other."),
+  extract_date DATE OPTIONS(description="Date extracted."),
+  insert_date DATE OPTIONS(description="Insert date.")
+)
+OPTIONS(description="Metadata for imported files, reports, and source systems.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.dim_event` (
+  event_id STRING OPTIONS(description="Unique event identifier."),
+  event STRING OPTIONS(description="Standard event name."),
+  event_category STRING OPTIONS(description="Standard event category."),
+  event_impact STRING OPTIONS(description="Standard event impact classification."),
+  event_start_date DATE OPTIONS(description="First date of the event."),
+  event_end_date DATE OPTIONS(description="Last date of the event."),
+  event_location STRING OPTIONS(description="Venue, neighborhood, city, market, or relevant event location."),
+  market STRING OPTIONS(description="Market impacted by the event."),
+  city STRING OPTIONS(description="City impacted by the event."),
+  state STRING OPTIONS(description="State or province impacted by the event."),
+  country STRING OPTIONS(description="Country impacted by the event."),
+  event_notes STRING OPTIONS(description="Supporting event notes."),
+  source_system STRING OPTIONS(description="Source system or manual source."),
+  source_report STRING OPTIONS(description="Source report or source feed name."),
+  source_file STRING OPTIONS(description="Source file path or file name, if imported."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+OPTIONS(description="Master event calendar table used for demand, pricing, forecast, pace, and BI context.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.bridge_property_event_date` (
+  property_code STRING OPTIONS(description="Property impacted by the event."),
+  date DATE OPTIONS(description="Date impacted by the event."),
+  event_id STRING OPTIONS(description="Event identifier from dim_event."),
+  event STRING OPTIONS(description="Event name, repeated for BI convenience."),
+  event_category STRING OPTIONS(description="Event category, repeated for BI convenience."),
+  event_impact STRING OPTIONS(description="Property/date-specific event impact classification."),
+  event_distance_miles FLOAT64 OPTIONS(description="Optional distance from property to event location in miles."),
+  is_primary_event BOOL OPTIONS(description="Flags the main event driving demand for the property/date."),
+  event_notes STRING OPTIONS(description="Property/date-specific notes."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, event_category
+OPTIONS(description="Bridge table connecting properties, dates, and events for BI and demand analysis.");
