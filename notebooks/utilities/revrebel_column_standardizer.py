@@ -3,6 +3,15 @@ REVREBEL Metrics Library column standardization helpers.
 
 Use this module inside ingestion notebooks before loading dataframes to BigQuery.
 
+Current hotel-date standard:
+- stay_date: hotel stay / occupancy / service date the metrics apply to
+- snap_date: point-in-time report or snapshot date
+- arrival_date: reservation arrival/check-in date
+- departure_date: reservation departure/check-out date
+- book_date: reservation booking / creation date
+- insert_date: row creation / ingestion date
+- updated_date: row update date
+
 Purpose:
 - normalize raw source headers into safe snake_case
 - rename known source columns to REVREBEL standard names
@@ -28,19 +37,28 @@ def normalize_header(value: Any) -> str:
     return text
 
 
-# Shared source-column to standard-column mappings.
-# Keys should already be normalized through normalize_header().
 COMMON_COLUMN_MAP: Dict[str, str] = {
-    # Dates / metadata
+    # Date roles
+    "date": "stay_date",
+    "day": "stay_date",
+    "stay_date": "stay_date",
+    "occupancy_date": "stay_date",
+    "business_date": "stay_date",
+    "service_date": "stay_date",
     "snapshot_date": "snap_date",
     "snap_date": "snap_date",
-    "stay_date": "date",
-    "business_date": "date",
-    "occupancy_date": "date",
-    "date": "date",
-    "arrival_date": "arrival_date",
-    "departure_date": "departure_date",
     "comparison_date_last_year": "comparison_date_ly",
+    "arrival_date": "arrival_date",
+    "check_in_date": "arrival_date",
+    "checkin_date": "arrival_date",
+    "departure_date": "departure_date",
+    "check_out_date": "departure_date",
+    "checkout_date": "departure_date",
+    "booking_date": "book_date",
+    "book_date": "book_date",
+    "created_date": "insert_date",
+    "inserted_date": "insert_date",
+    "updated_date": "updated_date",
     "etl_date": "etl_date",
 
     # Property
@@ -51,7 +69,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "property_id": "property_code",
     "property_code": "property_code",
 
-    # Base rooms / revenue / inventory
+    # Base rooms / inventory
     "rooms": "rms",
     "room_nights": "rms",
     "room_nights_sold": "rms",
@@ -66,7 +84,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "remaining_capacity_this_year": "remaining_rms",
     "remaining_capacity_last_year_actual": "remaining_rms_ly",
 
-    # Pace rooms
+    # OTB / pace rooms
     "rooms_otb": "rms_otb",
     "rooms_on_the_books": "rms_otb",
     "occupancy_on_books_this_year": "rms_otb",
@@ -79,7 +97,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "rooms_st3y": "rms_st3y",
     "rooms_st4y": "rms_st4y",
 
-    # Group / transient rooms sold from property pace exports
+    # Property-level group/transient rooms
     "rooms_sold_group_this_year": "group_rms_otb",
     "rooms_sold_group_last_year_actual": "group_rms_ly",
     "rooms_sold_group_stly": "group_rms_stly",
@@ -91,6 +109,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
     # Revenue
     "revenue": "rev",
+    "room_revenue": "rev",
     "revenue_otb": "rev_otb",
     "rev_otb": "rev_otb",
     "booked_room_revenue_this_year": "rev_otb",
@@ -110,12 +129,12 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "budget_room_revenue_last_year_actual": "rev_bgt_ly",
     "budget_revenue_this_year": "rev_bgt",
     "budget_revenue_last_year_actual": "rev_bgt_ly",
-    "rooms_forecast": "rms_fct",
     "rev_forecast": "rev_fct",
-    "rooms_budget": "rms_bgt",
     "rev_budget": "rev_bgt",
 
-    # Forecast / budget occupancy counts from Duetto property/segment exports
+    # Forecast / budget rooms
+    "rooms_forecast": "rms_fct",
+    "rooms_budget": "rms_bgt",
     "occupancy_forecast_total_this_year": "rms_fct",
     "occupancy_forecast_total_last_year_actual": "rms_fct_ly",
     "occupancy_forecast_this_year": "rms_fct",
@@ -193,7 +212,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "bar_this_year": "bar_price",
     "bar_last_year_actual": "bar_price_ly",
 
-    # Events - events should ultimately live in dim_event / bridge_property_event_date.
+    # Events - source-of-truth should ultimately live in dim_event / bridge_property_event_date.
     "special_event_this_year": "primary_event",
     "special_event_last_year_actual": "primary_event_ly",
 
@@ -218,13 +237,14 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
     # Segment / source / channel
     "business_view": "segment",
+    "forecast_group": "segment",
     "market_code": "segment_code",
     "market_segment": "market_segment",
     "detail": "segment_detail",
     "booking_source": "source",
     "source_name": "source",
 
-    # Room type
+    # Room type / room class
     "room_type": "roomtype",
     "roomtype": "roomtype",
     "room_type_code": "roomtype_code",
@@ -239,9 +259,9 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
     # Pricing
     "shop_date": "shop_date",
-    "check_in": "date",
-    "checkin": "date",
-    "staydate": "date",
+    "check_in": "arrival_date",
+    "checkin": "arrival_date",
+    "staydate": "stay_date",
     "length_of_stay": "los",
     "los": "los",
     "guests": "guest_count",
@@ -263,6 +283,8 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
 
 REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
+    "snap_property": {**COMMON_COLUMN_MAP},
+    "snap_pace_property": {**COMMON_COLUMN_MAP},
     "snap_pace_segment": {
         **COMMON_COLUMN_MAP,
         "today_rooms_commit": "rms_otb",
@@ -272,6 +294,8 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
         "st2y_date_rooms_commit": "rms_st2y",
         "st2y_date_room_revenue_commit": "rev_st2y",
         "business_view": "segment",
+        "forecast_group": "segment",
+        "market_segment": "segment",
     },
     "snap_pace_roomtype": {
         **COMMON_COLUMN_MAP,
@@ -279,8 +303,11 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
         "capacity_this_year": "available_rms",
         "capacity_last_year_actual": "available_rms_ly",
     },
-    "snap_property": {
+    "snap_pace_roomclass": {
         **COMMON_COLUMN_MAP,
+        "room_class": "roomclass",
+        "roomclass": "roomclass",
+        "room_class_code": "roomclass_code",
     },
     "snap_demand_property": COMMON_COLUMN_MAP,
     "snap_demand_segment": COMMON_COLUMN_MAP,
