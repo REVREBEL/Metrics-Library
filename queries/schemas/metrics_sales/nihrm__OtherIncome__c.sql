@@ -1,0 +1,25 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__OtherIncome__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__RevenueClassification__c STRING,
+  nihrm__Abbreviation__c STRING,
+  nihrm__Description__c STRING,
+  nihrm__IsActive__c BOOL,
+  nihrm__Location__c STRING,
+  nihrm__OtherIncomeCategory__c STRING,
+  nihrm__PmsCode__c STRING,
+  nihrm__Price__c FLOAT64,
+  nihrm__Property__c STRING,
+  nihrm__RevenueAssociation__c STRING,
+  nihrm__IsInclusive__c BOOL,
+  nihrm__NIHRMMigrations_ExternalID__c STRING,
+  nihrm__OtherIncomeCategoryId__c STRING
+);

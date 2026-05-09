@@ -1,0 +1,26 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__ReservationNight__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__Reservation__c STRING,
+  nihrm__Adults__c FLOAT64,
+  nihrm__Children__c FLOAT64,
+  nihrm__GuestroomTypeOccupied__c STRING,
+  nihrm__PatternDateString__c STRING,
+  nihrm__PatternDate__c DATE,
+  nihrm__PmsGroupId__c STRING,
+  nihrm__RateCode__c STRING,
+  nihrm__Rate__c FLOAT64,
+  nihrm__RoomBlock__c STRING,
+  nihrm__PmsRoomBlock__c STRING,
+  nihrm__VolumeContract__c STRING,
+  nihrm__NumberOfRooms__c FLOAT64,
+  nihrm__NIHRMMigrations_ExternalID__c STRING
+);

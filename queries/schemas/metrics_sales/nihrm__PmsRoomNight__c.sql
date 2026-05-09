@@ -1,0 +1,43 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__PmsRoomNight__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__PmsRoomBlock__c STRING,
+  nihrm__BlockedAverageRate__c FLOAT64,
+  nihrm__BlockedRate1__c FLOAT64,
+  nihrm__BlockedRate2__c FLOAT64,
+  nihrm__BlockedRate3__c FLOAT64,
+  nihrm__BlockedRate4__c FLOAT64,
+  nihrm__BlockedRevenue__c FLOAT64,
+  nihrm__BlockedRooms1__c FLOAT64,
+  nihrm__BlockedRooms2__c FLOAT64,
+  nihrm__BlockedRooms3__c FLOAT64,
+  nihrm__BlockedRooms4__c FLOAT64,
+  nihrm__BlockedRoomsTotal__c FLOAT64,
+  nihrm__GuestroomTypeCode__c STRING,
+  nihrm__GuestroomType__c STRING,
+  nihrm__PatternDateString__c STRING,
+  nihrm__PatternDate__c DATE,
+  nihrm__PickupAverageRate__c FLOAT64,
+  nihrm__PickupRate1__c FLOAT64,
+  nihrm__PickupRate2__c FLOAT64,
+  nihrm__PickupRate3__c FLOAT64,
+  nihrm__PickupRate4__c FLOAT64,
+  nihrm__PickupRevenue__c FLOAT64,
+  nihrm__PickupRooms1__c FLOAT64,
+  nihrm__PickupRooms2__c FLOAT64,
+  nihrm__PickupRooms3__c FLOAT64,
+  nihrm__PickupRooms4__c FLOAT64,
+  nihrm__PickupRoomsTotal__c FLOAT64,
+  nihrm__NIHRMMigrations_ExternalID__c STRING
+)
+OPTIONS(
+  labels=[("dataplex-data-documentation-published-location", "us-central1"), ("dataplex-data-documentation-published-project", "aparium-dataflow"), ("dataplex-data-documentation-published-scan", "a7857decb-7c13-4119-9a7c-d0e77d6c5ca0"), ("dataplex-dp-published-project", "aparium-dataflow"), ("dataplex-dp-published-location", "us-central1"), ("dataplex-dp-published-scan", "a07ff2ac8-d2e6-45ba-b17b-6fb488999eaa")]
+);

@@ -1,0 +1,27 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__EventItemRevenueBreakdown__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__EventItem__c STRING,
+  nihrm__RevenueClassification__c STRING,
+  nihrm__AdminCharge__c FLOAT64,
+  nihrm__ExternalId__c STRING,
+  nihrm__Gratuity__c FLOAT64,
+  nihrm__Location__c STRING,
+  nihrm__SourceSystemExternalId__c STRING,
+  nihrm__UniqueExternalId__c STRING,
+  nihrm__UnitPrice__c FLOAT64,
+  nihrm__AdminIsIncludedInInclusivePrice__c BOOL,
+  nihrm__GratuityIsIncludedInInclusivePrice__c BOOL,
+  nihrm__NIHRMMigrations_ExternalID__c STRING,
+  nihrm__ApplyChargesToDiscPrice__c BOOL,
+  nihrm__AlternateUnitPrice__c FLOAT64,
+  nihrm__InclusiveAlternateUnitPrice__c FLOAT64
+);

@@ -1,0 +1,28 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__BookingPackage__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__Booking__c STRING,
+  nihrm__Abbreviation__c STRING,
+  nihrm__AdvancedBooking__c STRING,
+  nihrm__ArrivalDate__c DATE,
+  nihrm__BookingArrival__c DATE,
+  nihrm__BookingDeparture__c DATE,
+  nihrm__BookingIdBookingPackageName__c STRING,
+  nihrm__BookingIdPackageIdString__c STRING,
+  nihrm__BookingRoomBlock__c STRING,
+  nihrm__DepartureDate__c DATE,
+  nihrm__Description__c STRING,
+  nihrm__IncludeGuestroomsInPackagePrice__c BOOL,
+  nihrm__Location__c STRING,
+  nihrm__Package__c STRING,
+  nihrm__BookingCheck__c STRING,
+  nihrm__NIHRMMigrations_ExternalID__c STRING
+);

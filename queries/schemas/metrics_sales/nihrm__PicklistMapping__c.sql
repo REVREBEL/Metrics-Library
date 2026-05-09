@@ -1,0 +1,26 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_sales.nihrm__PicklistMapping__c`
+(
+  Id STRING,
+  IsDeleted BOOL,
+  Name STRING,
+  CurrencyIsoCode STRING,
+  SetupOwnerId STRING,
+  CreatedDate TIMESTAMP,
+  CreatedById STRING,
+  LastModifiedDate TIMESTAMP,
+  LastModifiedById STRING,
+  SystemModstamp TIMESTAMP,
+  nihrm__CharacterCount__c FLOAT64,
+  nihrm__ControllingField__c STRING,
+  nihrm__FieldDescription__c STRING,
+  nihrm__FieldLabel__c STRING,
+  nihrm__FieldName__c STRING,
+  nihrm__InitializedFlag__c BOOL,
+  nihrm__ListSize__c FLOAT64,
+  nihrm__ObjectName__c STRING,
+  nihrm__RecordTypes__c STRING,
+  nihrm__SetupValueType__c STRING,
+  nihrm__VisibleLines__c FLOAT64,
+  nihrm__CustomRecordTypes__c STRING,
+  nihrm__Disabled__c BOOL
+);

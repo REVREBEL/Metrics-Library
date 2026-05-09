@@ -1,0 +1,26 @@
+CREATE OR REPLACE VIEW `aparium-dataflow.FinanceData.FilteredActualsDataV`
+AS WITH
+  RankedData AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (PARTITION BY property_code, segment_name, finance_period ORDER BY snapshot_date DESC) AS rn
+  FROM
+    `aparium-dataflow.FinanceData.FinanceActuals`
+  WHERE
+    segment_name IN ( 'Transient Rooms',
+      'Transient Revenue',
+      'Group Rooms',
+      'Group Revenue',
+      'Contract Rooms',
+      'Contract Revenue',
+      'Available Rooms',
+      'Rooms Sold',
+      'Occupied Rooms',
+      'Rooms Revenue',
+      'Other Rooms Revenue' ) )
+SELECT
+  *
+FROM
+  RankedData
+WHERE
+  rn = 1;

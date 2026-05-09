@@ -1,0 +1,26 @@
+CREATE TABLE `devrebel-big-query-database.dev_hotel_analytics.demand_segment_mix_daily`
+(
+  month STRING,
+  date DATETIME,
+  occ FLOAT64,
+  compset_occ FLOAT64,
+  occ_index FLOAT64,
+  occ_rank STRING,
+  occ_index_vs_prior_year_pct FLOAT64,
+  occ_index_chg_vs_prior_week_pct FLOAT64,
+  room_nights_current_my_hotel_totals INT64,
+  room_nights_chg_from_last_wk_my_hotel_totals INT64,
+  room_nights_var_pct_to_last_yr_my_hotel_totals FLOAT64,
+  room_nights_var_pct_to_last_yr_market_excl_totals FLOAT64,
+  room_nights_chg_pct_from_last_wk_my_hotel_totals FLOAT64,
+  room_nights_chg_pct_from_last_wk_market_excl_totals FLOAT64,
+  adr FLOAT64,
+  adr_rank FLOAT64,
+  revpar FLOAT64,
+  revpar_rank FLOAT64,
+  market_segment STRING,
+  detail STRING,
+  compset_no INT64,
+  snapshot_date DATETIME,
+  property_code STRING
+);
