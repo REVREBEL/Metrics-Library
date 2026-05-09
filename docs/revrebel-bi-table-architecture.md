@@ -94,7 +94,9 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 |---|---|---|
 | `property_code` | STRING | Primary property code. |
 | `property_name` | STRING | Standard property name. |
+| `property_shortname` | STRING | Standard property name. |
 | `property_status` | STRING | Active, inactive, onboarding, archived. |
+| `rating` | STRING | Star Rating. |
 | `brand` | STRING | Brand or collection. |
 | `market` | STRING | Primary market. |
 | `city` | STRING | City. |
@@ -102,6 +104,9 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `country` | STRING | Country. |
 | `timezone` | STRING | IANA timezone. |
 | `str_id` | STRING | Standard STR / CoStar identifier. |
+| `crs_id` | STRING | CRS identifier. |
+| `pms_id` | STRING | PMS identifier. |
+| `rateshop_id` | STRING | Rateshop identifier. |
 | `available_rms` | INT64 | Default room inventory, if stable. |
 | `open_date` | DATE | Property open date. |
 | `close_date` | DATE | Property close date, if applicable. |
@@ -129,7 +134,13 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 |---|---|---|
 | `segment` | STRING | Standard segment name. |
 | `segment_code` | STRING | Standard segment code. |
+| `segment_group` | STRING | Standard group segment name. |
+| `segment_group_code` | STRING | Standard group segment code. |
+| `finance_segment` | STRING | Finance segment name. |
+| `finance_segment_code` | STRING | Finance segment code. |
+| `gl_code` | STRING | Guest ledger code. |
 | `segment_category` | STRING | Group, transient, contract, complimentary, etc. |
+| `rate_basis` | STRING | full rate reported, net, mixed, discount |
 | `segment_sort` | INT64 | BI sort order. |
 | `is_active` | BOOL | Active flag. |
 | `insert_date` | DATE | Insert date. |
@@ -156,7 +167,11 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `property_code` | STRING | Property code. |
 | `roomtype` | STRING | Standard room type name. |
 | `roomtype_code` | STRING | Standard room type code. |
+| `bedtype` | STRING | Standard room type name. |
+| `bedtype_code` | STRING | Standard room type code. |
 | `roomclass` | STRING | Room class/category. |
+| `roomfeature` | STRING | Primary Feature, size, view, amenity. |
+| `related_roomtypes` | STRING | Room types that share ideinital feaures but may be seperated by bedtype or floor |
 | `available_rms` | INT64 | Default inventory for the roomtype, if stable. |
 | `roomtype_sort` | INT64 | BI sort order. |
 | `is_active` | BOOL | Active flag. |
@@ -291,6 +306,10 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `rms_fct` | INT64 |
 | `rev_fct` | FLOAT64 |
 | `adr_fct` | FLOAT64 |
+| `ns_rms` | INT64 |
+| `ns_rms_ly` | INT64 |
+| `cx_rms` | INT64 |
+| `cx_rms_ly` | INT64 |
 | `demand_total` | INT64 |
 | `demand_total_ly` | INT64 |
 | `demand_group` | INT64 |
@@ -356,6 +375,8 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `date` | DATE |
 | `source` | STRING |
 | `source_code` | STRING |
+| `source_group` | STRING |
+| `source_group_code` | STRING |
 | `channel` | STRING |
 | `channel_code` | STRING |
 | `source_map` | STRING |
@@ -374,6 +395,10 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `rev_st4y` | FLOAT64 |
 | `rms_fct` | INT64 |
 | `rev_fct` | FLOAT64 |
+| `cx_rms` | INT64 |
+| `cx_rms_ly` | INT64 |
+| `ns_rms` | INT64 |
+| `ns_rms_ly` | INT64 |
 | `source_system` | STRING |
 | `source_report` | STRING |
 | `source_file` | STRING |
