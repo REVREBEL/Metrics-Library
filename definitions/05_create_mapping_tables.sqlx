@@ -51,19 +51,22 @@ CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.
   roomtype_code STRING OPTIONS(description="Standard roomtype code."),
   bedtype STRING OPTIONS(description="Standard bed type."),
   bedtype_code STRING OPTIONS(description="Standard bed type code."),
-  roomclass STRING OPTIONS(description="Standard room class."),
+  roomclass STRING OPTIONS(description="Standard room class. A grouping of like room types that can be interchanged and have similar features or characteristics."),
+  roomclass_code STRING OPTIONS(description="Standard room class code."),
+  roomclass_map STRING OPTIONS(description="Source room class value."),
+  roomclass_code_map STRING OPTIONS(description="Source room class code."),
   roomfeature STRING OPTIONS(description="Primary room feature."),
-  roompool STRING OPTIONS(description="Standard room pool."),
-  roompool_code STRING OPTIONS(description="Standard room pool code."),
+  roompool STRING OPTIONS(description="Standard room pool, only when separately defined by the source system."),
+  roompool_code STRING OPTIONS(description="Standard room pool code, only when separately defined by the source system."),
   roompool_map STRING OPTIONS(description="Source room pool value."),
   roompool_code_map STRING OPTIONS(description="Source room pool code."),
-  related_roomtypes STRING OPTIONS(description="Descriptive list of related roomtypes included in the room pool."),
+  related_roomtypes STRING OPTIONS(description="Descriptive list of related roomtypes included in the room class or pool."),
   available_rms INT64 OPTIONS(description="Roomtype inventory, if known."),
   is_active BOOL OPTIONS(description="Active flag."),
   insert_date DATE OPTIONS(description="Insert date."),
   updated_date DATE OPTIONS(description="Updated date.")
 )
-OPTIONS(description="Maps source roomtype names and codes to standardized roomtype, roomclass, bedtype, and roompool values.");
+OPTIONS(description="Maps source roomtype names and codes to standardized roomtype, roomclass, bedtype, and optional roompool values.");
 
 CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.map_source_metric` (
   source_report_id STRING OPTIONS(description="Source report identifier."),
