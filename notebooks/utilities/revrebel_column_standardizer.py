@@ -42,6 +42,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "date": "stay_date",
     "day": "stay_date",
     "stay_date": "stay_date",
+    "staydate": "stay_date",
     "occupancy_date": "stay_date",
     "business_date": "stay_date",
     "service_date": "stay_date",
@@ -49,7 +50,9 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "snap_date": "snap_date",
     "comparison_date_last_year": "comparison_date_ly",
     "arrival_date": "arrival_date",
+    "check_in": "arrival_date",
     "check_in_date": "arrival_date",
+    "checkin": "arrival_date",
     "checkin_date": "arrival_date",
     "departure_date": "departure_date",
     "check_out_date": "departure_date",
@@ -148,6 +151,14 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "occupancy_forecast_transient_this_year": "transient_rms_fct",
     "occupancy_forecast_transient_last_year_actual": "transient_rms_fct_ly",
 
+    # User projected forecast values from IDeaS forecast-group / roomclass style exports
+    "user_projected_occupancy_this_year": "user_rms_fct",
+    "user_projected_occupancy_last_year_actual": "user_rms_fct_ly",
+    "user_projected_revenue_this_year": "user_rev_fct",
+    "user_projected_revenue_last_year_actual": "user_rev_fct_ly",
+    "user_projected_adr_this_year": "user_adr_fct",
+    "user_projected_adr_last_year_actual": "user_adr_fct_ly",
+
     # Demand
     "system_total_demand_total_this_year": "system_demand_total",
     "system_total_demand_total_last_year_actual": "system_demand_total_ly",
@@ -155,8 +166,12 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "system_total_demand_group_last_year_actual": "system_demand_group_ly",
     "system_total_demand_transient_this_year": "system_demand_transient",
     "system_total_demand_transient_last_year_actual": "system_demand_transient_ly",
+    "system_unconstrained_demand_this_year": "system_unconstrained_demand",
+    "system_unconstrained_demand_last_year_actual": "system_unconstrained_demand_ly",
     "user_total_demand_total_this_year": "user_demand_total",
     "user_total_demand_total_last_year_actual": "user_demand_total_ly",
+    "user_demand_this_year": "user_demand",
+    "user_demand_last_year_actual": "user_demand_ly",
     "user_constrained_total_demand_group_this_year": "user_constrained_demand_group",
     "user_constrained_total_demand_group_last_year_actual": "user_constrained_demand_group_ly",
     "user_unconstrained_total_demand_transient_this_year": "user_unconstrained_demand_transient",
@@ -167,6 +182,20 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "group_demand_total_ly_actual": "demand_group_ly",
     "transient_demand_total": "demand_transient",
     "transient_demand_total_ly_actual": "demand_transient_ly",
+
+    # Wash / LRV / BAR
+    "last_room_value_this_year": "lrv",
+    "last_room_value_last_year_actual": "lrv_ly",
+    "wash_this_year": "wash_pct",
+    "wash_last_year_actual": "wash_pct_ly",
+    "wash_pct_ly_actual": "wash_pct_ly",
+    "system_wash_this_year": "system_wash_pct",
+    "system_wash_last_year_actual": "system_wash_pct_ly",
+    "user_wash_this_year": "user_wash_pct",
+    "user_wash_last_year_actual": "user_wash_pct_ly",
+    "bar": "bar_price",
+    "bar_this_year": "bar_price",
+    "bar_last_year_actual": "bar_price_ly",
 
     # Arrivals / departures / cancellations / no-shows / OOO
     "arrivals_this_year": "arrival_rms",
@@ -203,14 +232,6 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "revpar_on_books_last_year_actual": "revpar_ly",
     "revpar_forecast_this_year": "revpar_fct",
     "revpar_forecast_last_year_actual": "revpar_fct_ly",
-    "last_room_value_this_year": "lrv",
-    "last_room_value_last_year_actual": "lrv_ly",
-    "wash_this_year": "wash_pct",
-    "wash_last_year_actual": "wash_pct_ly",
-    "wash_pct_ly_actual": "wash_pct_ly",
-    "bar": "bar_price",
-    "bar_this_year": "bar_price",
-    "bar_last_year_actual": "bar_price_ly",
 
     # Events - source-of-truth should ultimately live in dim_event / bridge_property_event_date.
     "special_event_this_year": "primary_event",
@@ -259,9 +280,6 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
     # Pricing
     "shop_date": "shop_date",
-    "check_in": "arrival_date",
-    "checkin": "arrival_date",
-    "staydate": "stay_date",
     "length_of_stay": "los",
     "los": "los",
     "guests": "guest_count",
