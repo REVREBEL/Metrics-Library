@@ -1,3 +1,5 @@
 defaultProject: revrebel-metrics
 defaultDataset: metrics_pace
+defaultAssertionDataset: metrics_pace_assertions
 defaultLocation: us-central1
+dataformCoreVersion: 3.0.0
