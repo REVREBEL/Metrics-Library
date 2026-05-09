@@ -1,0 +1,346 @@
+config {
+  type: "operations",
+  hasOutput: false,
+  tags: ["ddl", "facts", "actual", "pickup", "plan", "pricing"]
+}
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_actual_property` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  date DATE OPTIONS(description="Business/stay date."),
+  available_rms INT64 OPTIONS(description="Available room inventory."),
+  rms INT64 OPTIONS(description="Actual rooms / room nights sold."),
+  rev FLOAT64 OPTIONS(description="Actual room revenue."),
+  fb_rev FLOAT64 OPTIONS(description="Actual food and beverage revenue."),
+  other_rev FLOAT64 OPTIONS(description="Actual other revenue."),
+  total_rev FLOAT64 OPTIONS(description="Actual total revenue."),
+  guest_count INT64 OPTIONS(description="Actual guest count."),
+  arrival_rms INT64 OPTIONS(description="Actual arrival rooms."),
+  cx_rms INT64 OPTIONS(description="Cancelled rooms."),
+  ns_rms INT64 OPTIONS(description="No-show rooms."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code
+OPTIONS(description="Property-level actualized historical performance.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_actual_segment` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  date DATE OPTIONS(description="Business/stay date."),
+  segment STRING OPTIONS(description="Standard segment."),
+  segment_code STRING OPTIONS(description="Standard segment code."),
+  segment_group STRING OPTIONS(description="Standard segment group."),
+  segment_group_code STRING OPTIONS(description="Standard segment group code."),
+  finance_segment STRING OPTIONS(description="Finance segment."),
+  finance_segment_code STRING OPTIONS(description="Finance segment code."),
+  segment_category STRING OPTIONS(description="Standard segment category."),
+  rate_basis STRING OPTIONS(description="Rate basis for segment revenue interpretation."),
+  segment_map STRING OPTIONS(description="Source segment value."),
+  segment_code_map STRING OPTIONS(description="Source segment code."),
+  available_rms INT64 OPTIONS(description="Available room inventory."),
+  rms INT64 OPTIONS(description="Actual rooms / room nights sold."),
+  rev FLOAT64 OPTIONS(description="Actual room revenue."),
+  fb_rev FLOAT64 OPTIONS(description="Actual food and beverage revenue."),
+  other_rev FLOAT64 OPTIONS(description="Actual other revenue."),
+  total_rev FLOAT64 OPTIONS(description="Actual total revenue."),
+  guest_count INT64 OPTIONS(description="Actual guest count."),
+  arrival_rms INT64 OPTIONS(description="Actual arrival rooms."),
+  cx_rms INT64 OPTIONS(description="Cancelled rooms."),
+  ns_rms INT64 OPTIONS(description="No-show rooms."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, segment_code
+OPTIONS(description="Segment-level actualized historical performance.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_actual_source` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  date DATE OPTIONS(description="Business/stay date."),
+  source STRING OPTIONS(description="Standard source."),
+  source_code STRING OPTIONS(description="Standard source code."),
+  source_group STRING OPTIONS(description="Standard source group."),
+  source_group_code STRING OPTIONS(description="Standard source group code."),
+  channel STRING OPTIONS(description="Standard channel."),
+  channel_code STRING OPTIONS(description="Standard channel code."),
+  source_map STRING OPTIONS(description="Source value from report."),
+  source_code_map STRING OPTIONS(description="Source code from report."),
+  available_rms INT64 OPTIONS(description="Available room inventory."),
+  rms INT64 OPTIONS(description="Actual rooms / room nights sold."),
+  rev FLOAT64 OPTIONS(description="Actual room revenue."),
+  fb_rev FLOAT64 OPTIONS(description="Actual food and beverage revenue."),
+  other_rev FLOAT64 OPTIONS(description="Actual other revenue."),
+  total_rev FLOAT64 OPTIONS(description="Actual total revenue."),
+  guest_count INT64 OPTIONS(description="Actual guest count."),
+  arrival_rms INT64 OPTIONS(description="Actual arrival rooms."),
+  cx_rms INT64 OPTIONS(description="Cancelled rooms."),
+  ns_rms INT64 OPTIONS(description="No-show rooms."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, source_code
+OPTIONS(description="Source/channel-level actualized historical performance.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_actual_roomtype` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  date DATE OPTIONS(description="Business/stay date."),
+  roomtype STRING OPTIONS(description="Standard roomtype."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code."),
+  bedtype STRING OPTIONS(description="Standard bed type."),
+  bedtype_code STRING OPTIONS(description="Standard bed type code."),
+  roomclass STRING OPTIONS(description="Room class."),
+  roomfeature STRING OPTIONS(description="Primary room feature."),
+  roompool STRING OPTIONS(description="Standard room pool."),
+  roompool_code STRING OPTIONS(description="Standard room pool code."),
+  roomtype_map STRING OPTIONS(description="Source roomtype value."),
+  roomtype_code_map STRING OPTIONS(description="Source roomtype code."),
+  available_rms INT64 OPTIONS(description="Available room inventory."),
+  rms INT64 OPTIONS(description="Actual rooms / room nights sold."),
+  rev FLOAT64 OPTIONS(description="Actual room revenue."),
+  fb_rev FLOAT64 OPTIONS(description="Actual food and beverage revenue."),
+  other_rev FLOAT64 OPTIONS(description="Actual other revenue."),
+  total_rev FLOAT64 OPTIONS(description="Actual total revenue."),
+  guest_count INT64 OPTIONS(description="Actual guest count."),
+  arrival_rms INT64 OPTIONS(description="Actual arrival rooms."),
+  cx_rms INT64 OPTIONS(description="Cancelled rooms."),
+  ns_rms INT64 OPTIONS(description="No-show rooms."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, roomtype_code
+OPTIONS(description="Roomtype-level actualized historical performance.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pickup_property` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  snap_date DATE OPTIONS(description="Snapshot date."),
+  date DATE OPTIONS(description="Stay date."),
+  comparison STRING OPTIONS(description="Comparison period such as cy, stly, st2y, st3y, or st4y."),
+  pickup_window STRING OPTIONS(description="Pickup window such as 007, 014, 030, 060, or 090."),
+  rms_pickup INT64 OPTIONS(description="Rooms pickup for the comparison/window."),
+  rev_pickup FLOAT64 OPTIONS(description="Room revenue pickup for the comparison/window."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY snap_date
+CLUSTER BY property_code, date, comparison, pickup_window
+OPTIONS(description="Property-level pickup metrics by comparison and pickup window.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pickup_segment` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  snap_date DATE OPTIONS(description="Snapshot date."),
+  date DATE OPTIONS(description="Stay date."),
+  segment STRING OPTIONS(description="Standard segment."),
+  segment_code STRING OPTIONS(description="Standard segment code."),
+  segment_group STRING OPTIONS(description="Standard segment group."),
+  segment_group_code STRING OPTIONS(description="Standard segment group code."),
+  segment_category STRING OPTIONS(description="Standard segment category."),
+  segment_map STRING OPTIONS(description="Source segment value."),
+  segment_code_map STRING OPTIONS(description="Source segment code."),
+  comparison STRING OPTIONS(description="Comparison period such as cy, stly, st2y, st3y, or st4y."),
+  pickup_window STRING OPTIONS(description="Pickup window such as 007, 014, 030, 060, or 090."),
+  rms_pickup INT64 OPTIONS(description="Rooms pickup for the comparison/window."),
+  rev_pickup FLOAT64 OPTIONS(description="Room revenue pickup for the comparison/window."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY snap_date
+CLUSTER BY property_code, date, segment_code, comparison
+OPTIONS(description="Segment-level pickup metrics by comparison and pickup window.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pickup_source` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  snap_date DATE OPTIONS(description="Snapshot date."),
+  date DATE OPTIONS(description="Stay date."),
+  source STRING OPTIONS(description="Standard source."),
+  source_code STRING OPTIONS(description="Standard source code."),
+  source_group STRING OPTIONS(description="Standard source group."),
+  source_group_code STRING OPTIONS(description="Standard source group code."),
+  channel STRING OPTIONS(description="Standard channel."),
+  channel_code STRING OPTIONS(description="Standard channel code."),
+  source_map STRING OPTIONS(description="Source value from report."),
+  source_code_map STRING OPTIONS(description="Source code from report."),
+  comparison STRING OPTIONS(description="Comparison period such as cy, stly, st2y, st3y, or st4y."),
+  pickup_window STRING OPTIONS(description="Pickup window such as 007, 014, 030, 060, or 090."),
+  rms_pickup INT64 OPTIONS(description="Rooms pickup for the comparison/window."),
+  rev_pickup FLOAT64 OPTIONS(description="Room revenue pickup for the comparison/window."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY snap_date
+CLUSTER BY property_code, date, source_code, comparison
+OPTIONS(description="Source/channel-level pickup metrics by comparison and pickup window.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pickup_roomtype` (
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  snap_date DATE OPTIONS(description="Snapshot date."),
+  date DATE OPTIONS(description="Stay date."),
+  roomtype STRING OPTIONS(description="Standard roomtype."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code."),
+  bedtype STRING OPTIONS(description="Standard bed type."),
+  bedtype_code STRING OPTIONS(description="Standard bed type code."),
+  roomclass STRING OPTIONS(description="Room class."),
+  roomfeature STRING OPTIONS(description="Primary room feature."),
+  roompool STRING OPTIONS(description="Standard room pool."),
+  roompool_code STRING OPTIONS(description="Standard room pool code."),
+  roomtype_map STRING OPTIONS(description="Source roomtype value."),
+  roomtype_code_map STRING OPTIONS(description="Source roomtype code."),
+  comparison STRING OPTIONS(description="Comparison period such as cy, stly, st2y, st3y, or st4y."),
+  pickup_window STRING OPTIONS(description="Pickup window such as 007, 014, 030, 060, or 090."),
+  rms_pickup INT64 OPTIONS(description="Rooms pickup for the comparison/window."),
+  rev_pickup FLOAT64 OPTIONS(description="Room revenue pickup for the comparison/window."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY snap_date
+CLUSTER BY property_code, date, roomtype_code, comparison
+OPTIONS(description="Roomtype-level pickup metrics by comparison and pickup window.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_manual_plan` (
+  plan_id STRING OPTIONS(description="Unique planning row identifier."),
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  date DATE OPTIONS(description="Date the plan value applies to."),
+  plan_type STRING OPTIONS(description="Forecast, budget, override, target, scenario, or reforecast."),
+  scenario STRING OPTIONS(description="Planning scenario name."),
+  version STRING OPTIONS(description="Planning version such as v001, v002, or final."),
+  status STRING OPTIONS(description="Planning status such as Draft, Submitted, Approved, Locked, or Archived."),
+  grain_type STRING OPTIONS(description="Property, segment, source, roomtype, roompool, event, or other."),
+  grain_key STRING OPTIONS(description="Standard grain value or combined key for the planning row."),
+  segment STRING OPTIONS(description="Standard segment, if applicable."),
+  segment_code STRING OPTIONS(description="Standard segment code, if applicable."),
+  source STRING OPTIONS(description="Standard source, if applicable."),
+  source_code STRING OPTIONS(description="Standard source code, if applicable."),
+  roomtype STRING OPTIONS(description="Standard roomtype, if applicable."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code, if applicable."),
+  roompool STRING OPTIONS(description="Standard roompool, if applicable."),
+  roompool_code STRING OPTIONS(description="Standard roompool code, if applicable."),
+  metric_code STRING OPTIONS(description="Standard metric code."),
+  metric_value FLOAT64 OPTIONS(description="User-entered metric value."),
+  metric_value_type STRING OPTIONS(description="Count, currency, percent, ratio, or text."),
+  currency_code STRING OPTIONS(description="Currency code, if applicable."),
+  source_system STRING OPTIONS(description="Source of the writeback."),
+  source_sheet_id STRING OPTIONS(description="Google Sheet ID, if loaded from Sheets."),
+  source_sheet_name STRING OPTIONS(description="Google Sheet tab name, if loaded from Sheets."),
+  source_cell STRING OPTIONS(description="Optional source cell reference for auditability."),
+  submitted_by STRING OPTIONS(description="User who submitted or edited the value."),
+  submitted_at TIMESTAMP OPTIONS(description="Timestamp when the value was submitted."),
+  approved_by STRING OPTIONS(description="Approver, if applicable."),
+  approved_at TIMESTAMP OPTIONS(description="Approval timestamp, if applicable."),
+  plan_notes STRING OPTIONS(description="User-entered planning notes."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, plan_type, scenario, metric_code
+OPTIONS(description="Manual forecast, budget, scenario, and override writeback table for user-entered planning values.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_price_shop` (
+  price_shop_id STRING OPTIONS(description="Unique pricing observation identifier."),
+  property_code STRING OPTIONS(description="Property code."),
+  property_name STRING OPTIONS(description="Property name."),
+  shop_date DATE OPTIONS(description="Date the price was observed or scraped."),
+  shop_ts TIMESTAMP OPTIONS(description="Timestamp the price was observed or scraped."),
+  date DATE OPTIONS(description="Stay or arrival date the price applies to."),
+  los INT64 OPTIONS(description="Length of stay used in the price search."),
+  guest_count INT64 OPTIONS(description="Guest count used in the price search."),
+  adult_count INT64 OPTIONS(description="Adult count, if provided separately."),
+  child_count INT64 OPTIONS(description="Child count, if provided."),
+  shop_channel STRING OPTIONS(description="Channel shopped, such as Booking.com, Expedia, Brand.com, or Google Hotels."),
+  shop_channel_code STRING OPTIONS(description="Standard shop channel code."),
+  source_system STRING OPTIONS(description="Source system, scraper, rate shop provider, or manual source."),
+  source_report STRING OPTIONS(description="Source report or feed name."),
+  source_file STRING OPTIONS(description="Source file path or name, if imported."),
+  rate_type STRING OPTIONS(description="BAR, lowest, member, package, promo, opaque, mobile, etc."),
+  price_type STRING OPTIONS(description="BAR, lowest available, public rate, member rate, package rate, promo rate, or comp pricing type."),
+  currency_code STRING OPTIONS(description="Currency code."),
+  price_amt FLOAT64 OPTIONS(description="Observed price amount."),
+  price_amt_tax_incl FLOAT64 OPTIONS(description="Observed price including taxes and fees, if available."),
+  tax_amt FLOAT64 OPTIONS(description="Tax amount, if available."),
+  fee_amt FLOAT64 OPTIONS(description="Fee amount, if available."),
+  is_available BOOL OPTIONS(description="Whether the rate was available."),
+  is_soldout BOOL OPTIONS(description="Whether the stay date or channel was sold out."),
+  availability_status STRING OPTIONS(description="Available, unavailable, soldout, closed, error, or unknown."),
+  roomtype STRING OPTIONS(description="Standard roomtype, if available."),
+  roomtype_code STRING OPTIONS(description="Standard roomtype code, if available."),
+  roomtype_map STRING OPTIONS(description="Source room type value, if needed."),
+  roomtype_code_map STRING OPTIONS(description="Source room type code, if needed."),
+  roomclass STRING OPTIONS(description="Room class or category, if available."),
+  roompool STRING OPTIONS(description="Standard roompool, if available."),
+  roompool_code STRING OPTIONS(description="Standard roompool code, if available."),
+  rate_plan STRING OPTIONS(description="Rate plan name, if available."),
+  rate_plan_code STRING OPTIONS(description="Rate plan code, if available."),
+  rate_plan_map STRING OPTIONS(description="Source rate plan value, if needed."),
+  rate_plan_code_map STRING OPTIONS(description="Source rate plan code, if needed."),
+  meal_plan STRING OPTIONS(description="Meal plan or breakfast inclusion, if available."),
+  cancel_policy STRING OPTIONS(description="Cancellation policy text or category."),
+  payment_policy STRING OPTIONS(description="Pay now, pay later, prepaid, deposit, etc."),
+  is_refundable BOOL OPTIONS(description="Refundability flag."),
+  is_member_rate BOOL OPTIONS(description="Member/private rate flag."),
+  is_mobile_rate BOOL OPTIONS(description="Mobile-only rate flag."),
+  is_package_rate BOOL OPTIONS(description="Package rate flag."),
+  promo_text STRING OPTIONS(description="Promotion or rate text, if available."),
+  price_rank INT64 OPTIONS(description="Rank of the observed price in the shop result, if available."),
+  comp_property_code STRING OPTIONS(description="Competitor property code, if the observation is for a comp property."),
+  comp_property_name STRING OPTIONS(description="Competitor property name, if applicable."),
+  is_comp BOOL OPTIONS(description="True if the observation is for a competitor property rate."),
+  insert_date DATE OPTIONS(description="Insert date."),
+  updated_date DATE OPTIONS(description="Updated date.")
+)
+PARTITION BY shop_date
+CLUSTER BY property_code, date, shop_channel, price_type
+OPTIONS(description="Pricing observation table for BAR, lowest available, OTA, CRS, booking engine, rate shop, and competitive pricing data.");
+
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_metric_observation` (
+  property_code STRING OPTIONS(description="Property code."),
+  date DATE OPTIONS(description="Metric date."),
+  snap_date DATE OPTIONS(description="Snapshot date, if applicable."),
+  grain_type STRING OPTIONS(description="Property, segment, source, roomtype, other."),
+  grain_key STRING OPTIONS(description="Combined grain key or source-specific grain value."),
+  metric_code STRING OPTIONS(description="Standard metric code."),
+  metric_value FLOAT64 OPTIONS(description="Metric value."),
+  metric_value_type STRING OPTIONS(description="Count, currency, percent, ratio, or text."),
+  comparison STRING OPTIONS(description="cy, ly, stly, st2y, bgt, fct, act, etc."),
+  pickup_window STRING OPTIONS(description="007, 014, 030, 060, 090, if applicable."),
+  calc_method STRING OPTIONS(description="Source, derived, mapped, or manual."),
+  source_system STRING OPTIONS(description="Source system."),
+  source_report STRING OPTIONS(description="Source report."),
+  source_file STRING OPTIONS(description="Source file."),
+  insert_date DATE OPTIONS(description="Insert date.")
+)
+PARTITION BY date
+CLUSTER BY property_code, grain_type, metric_code
+OPTIONS(description="Sparse or irregular metrics that do not fit cleanly into standard wide fact tables.");
