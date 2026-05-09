@@ -26,7 +26,7 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok:1.18.46'
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
-    implementation 'org.apache.calcite.avatica:avatica-core:1.17.0'
+    implementation 'org.apache.calcite.avatica:avatica-core:1.27.0'
     implementation "org.apache.commons:commons-lang3:3.1"
     compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
     compile 'com.google.cloud:google-cloud-bigquery:1.137.2'
