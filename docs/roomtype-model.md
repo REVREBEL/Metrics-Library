@@ -57,7 +57,7 @@ lkp_roomfeature
 | `code` | STRING | Standard lookup code. |
 | `name` | STRING | Display name. |
 | `description` | STRING | Definition or usage notes. |
-| `sort_order` | INT64 | Optional display order. |
+| `sort` | INT64 | Optional display order. |
 | `is_active` | BOOL | Indicates whether the lookup value is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
@@ -238,7 +238,7 @@ The shorter format is easier to read. The stricter format is easier to audit. Pi
 | `roomfeature_code` | STRING | Standard primary room feature code. |
 | `roompool` | STRING | Optional roompool grouping label. |
 | `available_rms` | INT64 | Room inventory for the roomtype, when stable and known. |
-| `sort_order` | INT64 | Optional display order. |
+| `sort` | INT64 | Optional display order. |
 | `is_active` | BOOL | Indicates whether the roomtype is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
