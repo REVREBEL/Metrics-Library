@@ -115,19 +115,19 @@ body {
 .main-content h4,
 .main-content h5,
 .main-content h6 {
-  border-top: none !important;
   color: var(--foreground);
   font-family: "Khand", "Roboto", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  border: 0;
+  border: none !important;
+  border-width: 0;
   margin-bottom: 0.2em;
 }
 
 .main-content h1 {
   font-size: 3.7rem;
   line-height: 1;
-  border-top: 4px solid #aaa;
+  border-top: none !important;
   padding-top: 0.5em;
   margin-top: 3.5em;
 }
@@ -145,7 +145,7 @@ body {
   font-size: 2.5rem;
   line-height: 1;
   margin-top: 3em;
-  border-top: 4px solid #e0e0e0;
+  border-top: none !important;
   padding-top: 0.5em;
 }
 
