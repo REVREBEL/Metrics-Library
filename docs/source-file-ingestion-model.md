@@ -7,11 +7,11 @@ permalink: /source-file-ingestion-model/
 
 # Source File Ingestion Model
 
-The source data for the REVREBEL BI Platform may arrive as actual files, including CSV and Excel workbooks exported from PMS, RMS, CRS, rate shopping tools, OTA scrapes, Google Sheets, and other hotel systems.
+Source data for Metrics may arrive as actual files, including CSV and Excel workbooks exported from PMS, RMS, CRS, rate shopping tools, OTA scrapes, Google Sheets, and other hotel systems.
 
 Dataform is the right tool for creating standardized BigQuery tables and running transformations, but Dataform is not the primary file-ingestion tool for arbitrary local CSV/XLSX files.
 
-The recommended architecture is:
+The architecture is:
 
 ```text
 Source CSV / Excel files
@@ -22,16 +22,16 @@ Raw BigQuery staging tables or external tables
         ↓
 Dataform transformations
         ↓
-Standardized REVREBEL BI tables
+Standardized Metrics tables
 ```
 
 ## Key Principle
 
-Dataform should own the database model and transformations.
+Dataform owns the database model and transformations.
 
-A separate ingestion process should own file loading, file conversion, and raw table creation/loading.
+A separate ingestion process owns file loading, file conversion, and raw table creation/loading.
 
-## Recommended File Ingestion Flow
+## File Ingestion Flow
 
 ## 1. Land source files
 
@@ -44,7 +44,7 @@ Manual upload folder
 SFTP landing folder
 ```
 
-Recommended file metadata to preserve:
+File metadata to preserve:
 
 | Metadata | Purpose |
 |---|---|
@@ -59,7 +59,7 @@ Recommended file metadata to preserve:
 
 BigQuery does not natively load `.xlsx` files directly as standard table loads.
 
-Recommended options:
+Options:
 
 1. Convert Excel tabs to CSV, then load CSV into BigQuery.
 2. Convert Excel to Google Sheets and use a Google Sheets external table.
@@ -68,9 +68,9 @@ Recommended options:
 
 ## 3. Load raw/staging tables
 
-Raw/staging tables should preserve source columns as closely as possible, but still include standard operational metadata.
+Raw/staging tables should preserve source columns as closely as possible, while still including standard operational metadata.
 
-Recommended raw table naming:
+Raw table naming:
 
 ```text
 raw_{source_system}_{source_report}
@@ -90,13 +90,13 @@ raw_bookingdotcom_lowest_price_shop
 
 ## 4. Use Dataform to transform raw/staging into standardized tables
 
-Dataform should read from raw/staging tables and populate standardized tables such as:
+Dataform reads from raw/staging tables and populates standardized tables such as:
 
 ```text
-fact_pace_segment
-fact_pace_roomtype
-fact_demand_segment
-fact_demand_source
+snap_pace_segment
+snap_pace_roomtype
+snap_demand_segment
+snap_demand_source
 fact_price_shop
 fact_manual_plan
 ```
@@ -104,11 +104,11 @@ fact_manual_plan
 Example Dataform transform pattern:
 
 ```sql
-INSERT INTO `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.fact_pace_segment` (
+INSERT INTO `${dataform.projectConfig.defaultDatabase}.metrics_pace.snap_pace_segment` (
   property_code,
   property_name,
   snap_date,
-  date,
+  stay_date,
   segment,
   segment_code,
   segment_map,
@@ -126,7 +126,7 @@ SELECT
   property_code,
   hotel AS property_name,
   snapshot_date AS snap_date,
-  SAFE.PARSE_DATE('%Y%m%d', stay_date) AS date,
+  SAFE.PARSE_DATE('%Y%m%d', stay_date) AS stay_date,
   market_segment AS segment,
   market_code AS segment_code,
   market_segment AS segment_map,
@@ -139,24 +139,38 @@ SELECT
   'rms-otb-segment' AS source_report,
   source_file,
   CURRENT_DATE() AS insert_date
-FROM `${dataform.projectConfig.defaultProject}.raw.raw_duetto_rms_otb_segment`;
+FROM `${dataform.projectConfig.defaultDatabase}.raw.raw_duetto_rms_otb_segment`;
 ```
 
-## Recommended BigQuery Dataset Layout
+## BigQuery Dataset Layout
 
-Use separate datasets for raw and standardized data.
+Use separate datasets for raw, staging, core reference tables, and domain models.
 
 ```text
 raw
 stg
-revrebel_metrics
+metrics_core
+metrics_pace
+metrics_demand
+metrics_booking
+metrics_web
+metrics_finance
+metrics_sales
+metrics_social
 ```
 
 | Dataset | Purpose |
 |---|---|
 | `raw` | Raw file-loaded tables. Preserve original file/source structure. |
 | `stg` | Cleaned/typed staging tables with source columns normalized enough for transformations. |
-| `revrebel_metrics` | Standardized REVREBEL BI tables created by Dataform. |
+| `metrics_core` | Shared dimensions, mappings, and controlled lookup lists. |
+| `metrics_pace` | Pace, pickup, forecast, budget, and snapshot performance tables. |
+| `metrics_demand` | Demand, market, compset, rank, and index data. |
+| `metrics_booking` | Booking engine, CRS, reservation, and pricing/shop data. |
+| `metrics_web` | Website analytics, landing page, GA4, and search data. |
+| `metrics_finance` | Finance, P&L, payroll, expense, and budget data. |
+| `metrics_sales` | Sales activity, accounts, leads, groups, and RFP data. |
+| `metrics_social` | Social engagement, campaign, post, and platform metrics. |
 
 ## CSV Handling
 
@@ -168,28 +182,28 @@ CSV files can be loaded into BigQuery using:
 4. Python / n8n / Apps Script loaders.
 5. Scheduled transfer / ingestion workflow.
 
-Recommended CSV load path:
+CSV load path:
 
 ```text
 CSV file
   → Google Cloud Storage
   → BigQuery raw table
   → Dataform transform
-  → standardized fact table
+  → standardized table
 ```
 
 ## Excel Handling
 
 Excel files require conversion or a custom loader.
 
-Recommended Excel load path:
+Excel load path:
 
 ```text
 Excel file
   → Python / Apps Script / n8n reads workbook tabs
   → BigQuery raw table
   → Dataform transform
-  → standardized fact table
+  → standardized table
 ```
 
 Alternative path:
@@ -199,14 +213,14 @@ Excel file
   → Google Sheets conversion
   → BigQuery external table over Google Sheet
   → Dataform transform
-  → standardized fact table
+  → standardized table
 ```
 
 ## Google Sheets Writeback Handling
 
 For manual forecast and budget data, Google Sheets may remain the user-facing input layer.
 
-Recommended flow:
+Flow:
 
 ```text
 Google Sheet forecast/budget template
@@ -215,7 +229,7 @@ Google Sheet forecast/budget template
   → Dataform marts/views
 ```
 
-`fact_manual_plan` should preserve Sheet metadata:
+`fact_manual_plan` preserves Sheet metadata:
 
 ```text
 source_sheet_id
@@ -229,19 +243,19 @@ approved_at
 
 ## Dataform Responsibilities
 
-Dataform should handle:
+Dataform handles:
 
 1. Creating standardized tables.
 2. Creating staging views or transformation tables.
 3. Mapping raw source columns to standardized names.
 4. Casting values to standard types.
-5. Populating fact and dimension tables.
+5. Populating snapshot, fact, and dimension tables.
 6. Building mart and semantic views.
 7. Testing table quality and required fields.
 
 ## Non-Dataform Responsibilities
 
-Another ingestion process should handle:
+Another ingestion process handles:
 
 1. Detecting new files.
 2. Reading CSV and Excel files.
@@ -251,7 +265,7 @@ Another ingestion process should handle:
 6. Handling malformed rows and file-level errors.
 7. Moving files to processed/error folders.
 
-## Recommended Automation Pattern
+## Automation Pattern
 
 A practical automation pattern:
 
@@ -270,7 +284,7 @@ Google Drive / GCS watch folder
 
 Create a file registry table to track every loaded file.
 
-Recommended table:
+Table:
 
 ```text
 ctl_file_load
@@ -299,7 +313,7 @@ ctl_file_load
 ## Example Dataform DDL for File Registry
 
 ```sql
-CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultProject}.${dataform.projectConfig.defaultDataset}.ctl_file_load` (
+CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultDatabase}.metrics_core.ctl_file_load` (
   file_load_id STRING OPTIONS(description="Unique file load identifier."),
   source_file STRING OPTIONS(description="File name or storage path."),
   source_file_id STRING OPTIONS(description="Drive, GCS, or file system identifier."),
@@ -325,10 +339,10 @@ Dataform should not be treated as the direct CSV/XLSX loader.
 
 Use Dataform to create and transform the database model after files have been loaded to BigQuery raw or staging tables.
 
-Recommended pattern:
+Pattern:
 
 ```text
 Files in Drive/GCS
   → Loader writes raw BigQuery tables
-  → Dataform standardizes into REVREBEL BI tables
+  → Dataform standardizes into Metrics tables
 ```
