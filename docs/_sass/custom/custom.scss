@@ -259,13 +259,15 @@ body {
 
 .main-content ul,
 .main-content ol {
-  margin: 1em 0 1em 2em;
+    margin-top: 0;
+    margin-bottom: 1em;
+    margin-left: 2em;
 }
 
 .main-content ul li,
 .main-content ol li {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .main-content blockquote {
