@@ -1,7 +1,7 @@
 // Custom styles for the Metrics Library GitHub Pages site.
 // Loaded automatically by Just the Docs from docs/_sass/custom/custom.scss.
 
-@import url('https://fonts.googleapis.com/css2?family=Khand:wght@300;400;500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Khand:wght@300;400;500;600;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
   --rr-navy: #163666;
@@ -193,7 +193,7 @@ body {
 .main-content div.highlighter-rouge code,
 .main-content figure.highlight code {
   padding: 0;
-  font-family: "Poppins", "Roboto", sans-serif;
+  font-family: "Fira Code", helvetica, arial, sans-serif;
   font-weight: 400;
   font-size: 14px;
   color: var(--rr-ice) !important;
@@ -203,9 +203,9 @@ body {
 }
 
 .main-content code {
-  font-family: "Poppins", "Roboto", sans-serif;
+  font-family: "Fira Code", helvetica, arial, sans-serif;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
   color: var(--rr-navy);
   background-color: var(--rr-ice);
   padding: 0 0.2em;
