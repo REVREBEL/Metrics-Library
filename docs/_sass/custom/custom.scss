@@ -48,7 +48,6 @@ html,
 body {
   background-color: var(--background);
   width: 100%;
-  max-width: 1200px !important;
 }
 
 .main-content body {
@@ -187,6 +186,7 @@ body {
     width: 100%;
     overflow-x: auto;
     box-shadow: none;
+    background-color: var(--table-background);
 }
 
 td,
@@ -221,6 +221,10 @@ th {
 
 .highlight .s1 {
     color: var(--accent-4);
+}
+
+.highlight .o {
+    color: var(--accent-5);
 }
 
 .main-content pre,
