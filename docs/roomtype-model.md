@@ -11,7 +11,7 @@ Roomtype data looks simple until every PMS, RMS, CRS, and booking engine decides
 
 The Metrics roomtype model separates those concepts into controlled building blocks. Room category, room class, bed type, and room feature stay independent so they can be reused in different combinations across properties and systems. The standardized roomtype is then generated from those mapped attributes.
 
-This keeps source-system messiness in the mapping layer and gives Metrics a stable roomtype structure for pace, actuals, pricing, demand, availability, room pools, and BI views.
+This keeps source-system messiness in the mapping layer and gives Metrics a stable roomtype structure for pace, actuals, pricing, demand, availability, room pools, and reporting views.
 
 ## How We View Roomtype Data
 
@@ -19,7 +19,7 @@ Roomtype is not just a label. It is a structured commercial object.
 
 A roomtype tells us what can be sold, how it should be grouped, how it behaves in pricing and demand analysis, and how it rolls into room pools or room classes. A standard roomtype needs enough structure to support rate strategy, inventory analysis, room mix reporting, price sensitivity, and demand calculations without forcing every property into the same naming pattern.
 
-The model starts with independent lookup tables, maps source room values into those standard attributes, then publishes `dim_roomtype` as the production lookup used by ingestion and reporting.
+The model starts with independent lookup tables, maps source room values into standard attributes, and publishes `dim_roomtype` as the production reference used by ingestion and reporting.
 
 ## Table Family
 
@@ -29,8 +29,8 @@ The model starts with independent lookup tables, maps source room values into th
 | `lkp_roomclass` | Controlled list of commercial room class levels, such as Standard, Upgrade, or Best. |
 | `lkp_bedtype` | Controlled list of bed types, such as King, Queen, or Double. |
 | `lkp_roomfeature` | Controlled list of room features, such as View, Balcony, Accessible, or Fireplace. |
-| `map_roomtype` | Working source-to-standard mapping table used to classify source-system roomtype values. |
-| `dim_roomtype` | Production roomtype dimension used by ingestion, facts, snapshots, and reporting. Includes source resolution fields. |
+| `map_roomtype` | Source-to-standard mapping table used to classify source-system roomtype values. |
+| `dim_roomtype` | Production roomtype reference used by ingestion, facts, snapshots, and reporting. |
 | `dim_roompool` | Standard roompool dimension used to group interchangeable or strategically related roomtypes. |
 | `vw_roomtype` | Enriched view that joins the dimension to lookup labels and descriptions. |
 | `vw_roompool` | Enriched view that expands roompool groupings into readable roomtype relationships. |
@@ -41,21 +41,30 @@ The model starts with independent lookup tables, maps source room values into th
 
 Lookup tables define the controlled vocabulary. They should stay small, stable, and independent. The table name provides the context, so the columns can remain simple: `code`, `name`, and `description`.
 
-### `lkp_roomcategory`
+### Shared Lookup Columns
 
-Room category defines the broad product type.
+Applies to:
+
+```text
+lkp_roomcategory
+lkp_roomclass
+lkp_bedtype
+lkp_roomfeature
+```
 
 | Column | Type | Definition |
 |---|---|---|
-| `code` | STRING | Standard room category code. Examples: `ROOM`, `SUITE`, `VILLA`, `OTHER`. |
-| `name` | STRING | Display name for the room category. |
-| `description` | STRING | Definition or usage notes for the room category. |
+| `code` | STRING | Standard lookup code. |
+| `name` | STRING | Display name. |
+| `description` | STRING | Definition or usage notes. |
 | `sort_order` | INT64 | Optional display order. |
-| `is_active` | BOOL | Indicates whether the category is active. |
+| `is_active` | BOOL | Indicates whether the lookup value is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
 
-Example values:
+### Lookup Examples
+
+#### `lkp_roomcategory`
 
 | code | name | description |
 |---|---|---|
@@ -64,21 +73,7 @@ Example values:
 | `VILLA` | Villa | Villa, residence, or standalone accommodation product. |
 | `OTHER` | Other | Used when the product does not fit an existing category. |
 
-### `lkp_roomclass`
-
-Room class defines the commercial tier of the roomtype.
-
-| Column | Type | Definition |
-|---|---|---|
-| `code` | STRING | Standard room class code. Examples: `STD`, `UPGRADE`, `BEST`. |
-| `name` | STRING | Display name for the room class. |
-| `description` | STRING | Definition or usage notes for the room class. |
-| `sort_order` | INT64 | Optional display order. |
-| `is_active` | BOOL | Indicates whether the class is active. |
-| `insert_date` | DATE | Insert date. |
-| `updated_date` | DATE | Updated date. |
-
-Example values:
+#### `lkp_roomclass`
 
 | code | name | description |
 |---|---|---|
@@ -86,21 +81,7 @@ Example values:
 | `UPGRADE` | Upgrade | Enhanced room class above base. |
 | `BEST` | Best | Highest commercial room class or premium sellable tier. |
 
-### `lkp_bedtype`
-
-Bed type defines the primary bed configuration.
-
-| Column | Type | Definition |
-|---|---|---|
-| `code` | STRING | Standard bed type code. Examples: `KG`, `QN`, `DB`. |
-| `name` | STRING | Display name for the bed type. |
-| `description` | STRING | Definition or usage notes for the bed type. |
-| `sort_order` | INT64 | Optional display order. |
-| `is_active` | BOOL | Indicates whether the bed type is active. |
-| `insert_date` | DATE | Insert date. |
-| `updated_date` | DATE | Updated date. |
-
-Example values:
+#### `lkp_bedtype`
 
 | code | name | description |
 |---|---|---|
@@ -109,21 +90,7 @@ Example values:
 | `DB` | Double | Double bed configuration. |
 | `TW` | Twin | Twin bed configuration. |
 
-### `lkp_roomfeature`
-
-Room feature defines a primary differentiating feature. This should be used for features that materially affect pricing, demand, or room grouping.
-
-| Column | Type | Definition |
-|---|---|---|
-| `code` | STRING | Standard room feature code. Examples: `VIEW`, `BALC`, `ACC`, `FIRE`. |
-| `name` | STRING | Display name for the feature. |
-| `description` | STRING | Definition or usage notes for the feature. |
-| `sort_order` | INT64 | Optional display order. |
-| `is_active` | BOOL | Indicates whether the feature is active. |
-| `insert_date` | DATE | Insert date. |
-| `updated_date` | DATE | Updated date. |
-
-Example values:
+#### `lkp_roomfeature`
 
 | code | name | description |
 |---|---|---|
@@ -137,20 +104,20 @@ Example values:
 
 ## `map_roomtype`
 
-`map_roomtype` is the working source-to-standard translation layer. It stores the source-system room value and maps it into the standard attributes used to create the production roomtype dimension.
+`map_roomtype` is the source-to-standard translation layer. It stores the roomtype value as it appears in a source system and maps it into the standard room attributes used to create `dim_roomtype`.
 
-This table is where source roomtype values are reviewed, corrected, and governed. It should preserve source context without making the source system the standard. Source labels can be charmingly inconsistent. The mapped attributes are where the discipline lives.
+The source fields in this table use plain names because the table itself provides the context. Inside `map_roomtype`, `code`, `name`, and `description` mean the mapped source roomtype code, name, and description.
 
 ### Grain
 
 ```text
-property_code + source_system + source_report + source_code
+property_code + system + report + code
 ```
 
-If a source system does not provide a reliable source code, the effective grain may use:
+If a source system does not provide a reliable code, the effective grain may use:
 
 ```text
-property_code + source_system + source_report + source_name
+property_code + system + report + name
 ```
 
 ### Columns
@@ -158,31 +125,29 @@ property_code + source_system + source_report + source_name
 | Column | Type | Definition |
 |---|---|---|
 | `property_code` | STRING | Property code. |
-| `source_system` | STRING | Source system providing the roomtype value. |
-| `source_report` | STRING | Source report or feed where the roomtype appeared. |
-| `source_code` | STRING | Source-system roomtype code. |
-| `source_name` | STRING | Source-system roomtype name or label. |
-| `source_description` | STRING | Source-system roomtype description, if supplied. |
+| `system` | STRING | Source system providing the roomtype value. |
+| `report` | STRING | Source report or feed where the roomtype appeared. |
+| `code` | STRING | Source-system roomtype code. |
+| `name` | STRING | Source-system roomtype name or label. |
+| `description` | STRING | Source-system roomtype description, if supplied. |
 | `no_beds` | INT64 | Number of beds represented by the mapped roomtype. |
 | `roomcategory_code` | STRING | Standard room category code. Joins to `lkp_roomcategory.code`. |
 | `roomclass_code` | STRING | Standard room class code. Joins to `lkp_roomclass.code`. |
 | `bedtype_code` | STRING | Standard bed type code. Joins to `lkp_bedtype.code`. |
 | `roomfeature_code` | STRING | Standard primary room feature code. Joins to `lkp_roomfeature.code`. |
-| `roompool` | STRING | Optional source or standard roompool grouping label. Used to build `dim_roompool`. |
+| `roompool` | STRING | Optional roompool grouping label. Used to build `dim_roompool`. |
 | `roomtype_code` | STRING | Generated standard roomtype code. This becomes `dim_roomtype.code`. |
 | `is_active` | BOOL | Indicates whether the mapping is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
 
-### Source Fields from the User Notes
-
-The original working fields map into the standard model this way:
+### Working Field Alignment
 
 | Working Field | Standard Field | Notes |
 |---|---|---|
-| `code` | `source_code` | Source-system roomtype code. |
-| `name` | `source_name` | Source-system roomtype name. |
-| `description` | `source_description` | Source-system roomtype description. |
+| `code` | `code` | Source-system roomtype code. |
+| `name` | `name` | Source-system roomtype name. |
+| `description` | `description` | Source-system roomtype description. |
 | `no_rooms` | `no_beds` | Rename if the value represents bed count. Use `no_rooms` only if it truly means room count. |
 | `roomclass_code` | `roomclass_code` | Standard room class. |
 | `bedtype_code` | `bedtype_code` | Standard bed type. |
@@ -194,36 +159,40 @@ The original working fields map into the standard model this way:
 
 ## `dim_roomtype`
 
-`dim_roomtype` is the production roomtype dimension. It is generated from `map_roomtype`, but it also carries the source resolution fields needed during ingestion.
+`dim_roomtype` is the production roomtype reference table. It is generated from `map_roomtype`, but it should not carry every source field from the map table.
 
-This is intentional. Metrics cleans source data before it lands in the standard metric tables. When an actuals, pace, pricing, or demand file is processed, the pipeline needs to resolve the incoming source roomtype directly against a production lookup table. It should not have to join to `map_roomtype` first, then hop to `dim_roomtype`, just to identify the standard roomtype. That is a lot of ceremony for something that should be boring and reliable.
+The dimension only needs the single mapped source lookup value required during processing:
 
-The mapping table governs how source values translate. The dimension table publishes the resolved production lookup.
-
-### Source Resolution Logic
-
-Incoming data can match to `dim_roomtype` using source fields:
-
-```sql
-LEFT JOIN metrics_core.dim_roomtype rt
-  ON incoming.property_code = rt.property_code
- AND incoming.source_system = rt.source_system
- AND incoming.source_roomtype_code = rt.source_code
+```text
+map_roomtype_code
 ```
 
-If the incoming file does not provide a reliable source code, the fallback match can use source name:
+That value connects incoming cleaned data back to the source roomtype code that was mapped, while keeping the dimension focused on the standardized roomtype attributes. This avoids the three-hop lookup problem without turning the dimension into a duplicate copy of the mapping table.
+
+### Processing Logic
+
+Incoming source files can resolve roomtypes directly through `dim_roomtype.map_roomtype_code`:
 
 ```sql
 LEFT JOIN metrics_core.dim_roomtype rt
   ON incoming.property_code = rt.property_code
- AND incoming.source_system = rt.source_system
- AND incoming.source_roomtype_name = rt.source_name
+ AND incoming.roomtype_code = rt.map_roomtype_code
 ```
 
 Once resolved, the pipeline writes the standard code to the target table:
 
 ```text
-incoming source roomtype → dim_roomtype.source_code/source_name → dim_roomtype.code → target.roomtype_code
+incoming source roomtype code → dim_roomtype.map_roomtype_code → dim_roomtype.code → target.roomtype_code
+```
+
+The full source context remains in `map_roomtype`:
+
+```text
+map_roomtype.system
+map_roomtype.report
+map_roomtype.code
+map_roomtype.name
+map_roomtype.description
 ```
 
 ### Code Generation
@@ -258,11 +227,7 @@ The shorter format is easier to read. The stricter format is easier to audit. Pi
 | Column | Type | Definition |
 |---|---|---|
 | `property_code` | STRING | Property code. |
-| `source_system` | STRING | Source system providing the roomtype value. |
-| `source_report` | STRING | Source report or feed where the roomtype appeared. |
-| `source_code` | STRING | Source-system roomtype code used to resolve incoming data. |
-| `source_name` | STRING | Source-system roomtype name used as a fallback resolution field. |
-| `source_description` | STRING | Source-system roomtype description, if supplied. |
+| `map_roomtype_code` | STRING | Source roomtype code from `map_roomtype.code`. Used to resolve incoming source data. |
 | `code` | STRING | Standard roomtype code generated from mapped attributes. This is the value written to target tables as `roomtype_code`. |
 | `name` | STRING | Standard roomtype display name. |
 | `description` | STRING | Standard roomtype description. |
@@ -271,7 +236,7 @@ The shorter format is easier to read. The stricter format is easier to audit. Pi
 | `roomclass_code` | STRING | Standard room class code. |
 | `bedtype_code` | STRING | Standard bed type code. |
 | `roomfeature_code` | STRING | Standard primary room feature code. |
-| `roompool` | STRING | Optional source or standard roompool grouping label. |
+| `roompool` | STRING | Optional roompool grouping label. |
 | `available_rms` | INT64 | Room inventory for the roomtype, when stable and known. |
 | `sort_order` | INT64 | Optional display order. |
 | `is_active` | BOOL | Indicates whether the roomtype is active. |
@@ -321,7 +286,7 @@ A room pool can represent interchangeable roomtypes, a strategic grouping, or a 
 | `name` | STRING | Roompool display name. |
 | `description` | STRING | Roompool description or usage notes. |
 | `related_roomtypes` | STRING | Comma-separated list of roomtype codes included in the pool. |
-| `roompool_source` | STRING | Optional source roompool label from `map_roomtype.roompool`. |
+| `roompool` | STRING | Source or mapped roompool grouping label. |
 | `sort_order` | INT64 | Optional display order. |
 | `is_active` | BOOL | Indicates whether the roompool is active. |
 | `insert_date` | DATE | Insert date. |
@@ -360,7 +325,7 @@ STRING_AGG(roomtype_code, ',' ORDER BY roomtype_code) AS related_roomtypes
 
 Example output:
 
-| roompool_source | Included roomtype codes | dim_roompool.code | dim_roompool.related_roomtypes |
+| roompool | Included roomtype codes | dim_roompool.code | dim_roompool.related_roomtypes |
 |---|---|---|---|
 | `group 1` | `1KGSTDSUITE`, `2QNUPGRADEROOM` | `1KGSTDSUITE2QNUPGRADEROOM` | `1KGSTDSUITE,2QNUPGRADEROOM` |
 | `group 2` | `1KGBESTVIEWROOM`, `2QNUPGRADEROOM` | `1KGBESTVIEWROOM2QNUPGRADEROOM` | `1KGBESTVIEWROOM,2QNUPGRADEROOM` |
@@ -376,10 +341,7 @@ Example output:
 | Column | Source | Definition |
 |---|---|---|
 | `property_code` | `dim_roomtype` | Property code. |
-| `source_system` | `dim_roomtype` | Source system. |
-| `source_report` | `dim_roomtype` | Source report or feed. |
-| `source_code` | `dim_roomtype` | Source-system roomtype code. |
-| `source_name` | `dim_roomtype` | Source-system roomtype name. |
+| `map_roomtype_code` | `dim_roomtype` | Source roomtype code used for ingestion lookup. |
 | `roomtype_code` | `dim_roomtype.code` | Standard roomtype code. |
 | `roomtype` | `dim_roomtype.name` | Standard roomtype name. |
 | `roomtype_description` | `dim_roomtype.description` | Standard roomtype description. |
@@ -411,7 +373,6 @@ Example output:
 | `roompool` | `dim_roompool.name` | Roompool name. |
 | `roompool_description` | `dim_roompool.description` | Roompool description. |
 | `related_roomtypes` | `dim_roompool.related_roomtypes` | Comma-separated roomtype codes in the pool. |
-| `roompool_source` | `dim_roompool.roompool_source` | Source or mapped roompool grouping label. |
 | `is_active` | `dim_roompool.is_active` | Active flag. |
 
 ---
@@ -423,8 +384,8 @@ Roomtype-level source files should resolve against `dim_roomtype` during process
 For example:
 
 ```text
-source file roomtype code/name
-  → dim_roomtype.source_code/source_name
+source file roomtype code
+  → dim_roomtype.map_roomtype_code
   → dim_roomtype.code
   → snap_pace_roomtype.roomtype_code
 ```
@@ -438,17 +399,17 @@ fact_price_shop.roomtype_code
 snap_demand_roomtype.roomtype_code
 ```
 
-The reporting layer can join to `vw_roomtype` to bring in room category, room class, bed type, feature labels, and source lineage.
-
-That keeps the metric tables focused on metrics, while `dim_roomtype` gives the ingestion process a direct production lookup. No unnecessary three-hop scavenger hunt.
+The reporting layer can join to `vw_roomtype` to bring in room category, room class, bed type, feature labels, and the mapped roomtype lookup code.
 
 ## Operating Notes
 
 1. `lkp_` tables define controlled values. They do not know anything about a specific property.
 2. `map_roomtype` translates and governs source-system room values before they are published into the production dimension.
-3. `dim_roomtype` carries both source resolution fields and standard roomtype attributes so ingestion can resolve roomtypes directly.
-4. `dim_roompool` groups roomtype codes into strategic or interchangeable room pools.
-5. `vw_roomtype` and `vw_roompool` provide the readable version for dashboards, QA, and exports.
-6. Use `roomcategory_code`, not `roomcategory`, in modeled tables. Labels belong in lookup joins and views.
-7. Use `no_beds`, not `no_rooms`, when the value means bed count.
-8. Generated codes should be deterministic. Same attributes in, same code out. Always.
+3. `map_roomtype` uses `system`, `report`, `code`, `name`, and `description`; it does not use the `source_` prefix because the table context already makes those fields source-oriented.
+4. `dim_roomtype` carries `map_roomtype_code` as the single lookup back to the mapped source roomtype code.
+5. `dim_roomtype` should not carry `system`, `report`, `name`, or `description` from the mapping table unless a future use case requires a deliberate denormalized export.
+6. `dim_roompool` groups roomtype codes into strategic or interchangeable room pools.
+7. `vw_roomtype` and `vw_roompool` provide the readable version for dashboards, QA, and exports.
+8. Use `roomcategory_code`, not `roomcategory`, in modeled tables. Labels belong in lookup joins and views.
+9. Use `no_beds`, not `no_rooms`, when the value means bed count.
+10. Generated codes should be deterministic. Same attributes in, same code out. Always.
