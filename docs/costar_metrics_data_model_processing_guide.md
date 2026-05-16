@@ -254,6 +254,21 @@ MSPHEH
 
 Extract STR / CoStar identifier (`str_id`).
 
+```
+cs_id = STR IDs concatenated with hyphens
+```
+
+![alt](https://raw.githubusercontent.com/REVREBEL/Metrics-Library/main/assets/images/costar_compset_id_extraction_example.png)
+
+
+Example:
+```
+65206-54429-55653-44555-56751-39388
+```
+
+> This uniquely defines the comp set composition.
+
+
 
 
 ## Tertiary Identification Method
