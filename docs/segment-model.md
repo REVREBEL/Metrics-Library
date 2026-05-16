@@ -272,6 +272,7 @@ This keeps group assignment controlled by the segment lookup instead of manually
 | `finance_segment` | `lkp_finance_segment.name` | Finance segment name. |
 | `finance_segment_description` | `lkp_finance_segment.description` | Finance segment description. |
 | `gl_code` | `dim_segment` | General ledger or guest ledger code. |
+| `sort` | INT64 | Display order for reporting. |
 | `is_active` | `dim_segment` | Active flag. |
 
 ---
