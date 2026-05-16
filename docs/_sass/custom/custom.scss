@@ -70,10 +70,10 @@ body {
     font-weight: 300;
     color: var(--foreground);
     font-size: 16px;
-    color: #163666;
     line-height: 1.4em;
     background-color: var(--background);
     padding: 0.7em;
+    max-width: 1200px !important;
 }
 
 .side-bar,
@@ -99,6 +99,9 @@ body {
 .main-content-wrap,
 .main-content {
     background-color: var(--background);
+    max-width: 1200px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .main-content {
@@ -195,6 +198,7 @@ body {
     display: block; 
     font: 100%;
     border-collapse: collapse;
+    border: 1px solid var(--table-foreground);
     width: 100%;
     overflow-x: auto;
     box-shadow: none;
