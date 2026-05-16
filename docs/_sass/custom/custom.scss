@@ -9,8 +9,10 @@
     --light-green: #00a6b6;
     --green: #71c9c5;
     --smoke: #eff5f6;
+    --orange: #f37d59;
     --red: #e05047;
     --light: #fafafa;
+    
     
     --foreground: var(--primary);
     --forground-muted: #666666;
@@ -18,7 +20,9 @@
     
     --accent-1: var(--green);
     --accent-2: var(--smoke);
-    --accent-3: var(--light-green);    
+    --accent-3: var(--light-green);  
+    --accent-4: var(--orange);  
+    --accent-5: var(--red);  
     
     --table-foreground: var(--primary);
     --table-background: #ffffff;
@@ -33,6 +37,8 @@
     --code-accent: var(--smoke);
 }
 
+$content-max-width: 1200px;
+
 * {
     margin: 0;
     padding: 0;
@@ -42,6 +48,21 @@
 html,
 body {
   background-color: var(--background);
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Adjust for tablet or small laptops */
+@media screen and (min-width: 914px) {
+    body {
+        max-width: 854px; 
+        padding: 2cm;
+    }
+}
+
+
+.main-content {
+    max-width: 95% !important;
 }
 
 .main-content body {
@@ -165,14 +186,17 @@ body {
 
 .table-wrapper {
     border-radius: 2px;
+    border: 1px solid var(--table-foreground);
     box-shadow: none;
 }
 
 .main-content table {
     font-size: inherit;
+    display: block; 
     font: 100%;
     border-collapse: collapse;
     width: 100%;
+    overflow-x: auto;
     box-shadow: none;
 }
 
@@ -204,6 +228,10 @@ th {
     
 .highlight .k {
     color: var(--accent-3);
+}
+
+.highlight .s1 {
+    color: var(--accent-4);
 }
 
 .main-content pre,
