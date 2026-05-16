@@ -155,13 +155,24 @@ body {
 .main-content div.highlighter-rouge,
 .main-content figure.highlight {
   margin: 1em 0;
-  padding: 0 !important;
+  padding: 1rem !important;
   background-color: var(--rr-navy) !important;
   border: 1px solid var(--rr-navy) !important;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
-.main-content pre,
+.main-content div.highlighter-rouge div.highlight,
+.main-content figure.highlight div.highlight,
+.main-content .highlight {
+  overflow-x: auto;
+  padding: 0 !important;
+  margin: 0;
+  background-color: var(--rr-navy) !important;
+  border: 0 !important;
+  border-radius: 0;
+}
+
+.main-content .highlighter-rouge pre,
 .main-content .highlight pre,
 .main-content div.highlighter-rouge pre,
 .main-content figure.highlight pre {
@@ -170,10 +181,11 @@ body {
   line-height: 1.5em;
   color: var(--rr-ice) !important;
   background-color: var(--rr-navy) !important;
-  padding: 12px !important;
+  padding: 0 !important;
   overflow: auto;
   box-shadow: none;
   text-transform: none;
+  border: 0 !important;
 }
 
 .main-content pre code,
@@ -191,15 +203,15 @@ body {
 }
 
 .main-content code {
-  font-family: "Khand", "Poppins", "Roboto", sans-serif;
+  font-family: "Poppins", "Roboto", sans-serif;
   font-size: 16px;
   font-weight: 700;
-  text-transform: uppercase;
   color: var(--rr-navy);
   background-color: var(--rr-ice);
   padding: 0 0.2em;
   border: 1px solid var(--rr-ice);
   border-radius: 0;
+  text-transform: none;
 }
 
 .main-content a code,
