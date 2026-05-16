@@ -51,7 +51,7 @@ Because of this, the Metrics Platform models events as a reusable contextual lay
 The event framework uses two core tables:
 
 | Table | Purpose |
-|||
+|---|---|
 | `dim_event` | Master event calendar and standardized event metadata |
 | `bridge_property_event_date` | Property/date-level event relationship layer |
 
@@ -115,7 +115,7 @@ One row per unique event.
 ## Core Event Fields
 
 | Column | Type | Notes |
-||||
+|---|---|---|
 | `event_id` | STRING | Unique event identifier |
 | `event` | STRING | Standardized event name |
 | `event_category` | STRING | Standardized event classification |
@@ -168,7 +168,7 @@ property_code + date + event_id
 ## Core Bridge Fields
 
 | Column | Type | Notes |
-||||
+|---|---|---|
 | `property_code` | STRING | Property impacted by the event |
 | `date` | DATE | Impacted reporting date |
 | `event_id` | STRING | Linked event identifier |
@@ -194,7 +194,7 @@ event_category
 ```
 
 | Value |
-||
+|---|
 | `Convention` |
 | `Holiday` |
 | `Observance` |
@@ -222,7 +222,7 @@ event_impact
 ```
 
 | Value |
-||
+|---|
 | `Citywide Sellout` |
 | `Citywide Limited` |
 | `High Impact` |
@@ -311,7 +311,7 @@ This preserves consistency across all downstream reporting layers.
 BI marts may flatten event relationships into reporting-friendly fields for dashboard simplicity.
 
 | Column | Type | Purpose |
-||||
+|---|---|---|
 | `primary_event` | STRING | Main event affecting the property/date |
 | `primary_event_category` | STRING | Category of primary event |
 | `primary_event_impact` | STRING | Primary event impact level |
