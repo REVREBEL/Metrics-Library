@@ -7,74 +7,169 @@ permalink: /source-file-ingestion-model/
 
 # Source File Ingestion Model
 
-Source data for Metrics may arrive as actual files, including CSV and Excel workbooks exported from PMS, RMS, CRS, rate shopping tools, OTA scrapes, Google Sheets, and other hotel systems.
+## Metrics Platform
 
-Dataform is the right tool for creating standardized BigQuery tables and running transformations, but Dataform is not the primary file-ingestion tool for arbitrary local CSV/XLSX files.
+This document defines the file ingestion architecture used throughout the Metrics Platform. Hospitality data rarely arrives in a clean, consistent, warehouse-ready format.
 
-The architecture is:
+**Source data may originate from:**
+
+* PMS exports,
+* RMS systems,
+* CRS reports,
+* Booking engines,
+* OTA extranets,
+* Rate shopping tools,
+* Google Sheets,
+* Finance systems,
+* Manual operational files,
+* or vendor-generated Excel workbooks that appear to have survived several ownership transitions.
+
+The Metrics Platform standardizes these disconnected source files into a unified reporting framework used for:
+
+* operational reporting,
+* forecasting,
+* pricing analysis,
+* benchmark intelligence,
+* automation workflows,
+* and downstream analytics.
+
+**The objective is not simply loading files into BigQuery, the objective is preserving operational meaning, source traceability, and reporting consistency throughout the ingestion pipeline.**
+
+
+
+# Ingestion Architecture Philosophy
+
+The Metrics Platform intentionally separates:
+
+* file ingestion,
+* raw source preservation,
+* staging transformations,
+* semantic standardization,
+* and reporting-layer modeling
+
+into independent architectural layers.
+
+This separation preserves:
+
+* source traceability,
+* ingestion flexibility,
+* warehouse stability,
+* transformation reproducibility,
+* and operational auditability.
+
+Because hospitality source systems rarely agree on:
+
+* naming conventions,
+* reporting grains,
+* date formats,
+* metric structures,
+* or whether “final_final_v2_USE_THIS.xlsx” was actually the final file.
+
+
+
+# Core Ingestion Architecture
 
 ```text
-Source CSV / Excel files
+Source CSV / Excel Files
         ↓
-File landing location
+Landing Location
         ↓
-Raw BigQuery staging tables or external tables
+Raw BigQuery Tables
         ↓
-Dataform transformations
+Staging & Standardization
         ↓
-Standardized Metrics tables
+Dataform Transformations
+        ↓
+Standardized Metrics Tables
+        ↓
+BI Marts & Reporting Views
 ```
 
-## Key Principle
+The architecture intentionally separates ingestion from transformation responsibilities.
 
-Dataform owns the database model and transformations.
 
-A separate ingestion process owns file loading, file conversion, and raw table creation/loading.
 
-## File Ingestion Flow
+# Core Principle
 
-## 1. Land source files
+Dataform owns:
 
-Store raw files in a consistent location, such as:
+* warehouse structure,
+* transformations,
+* semantic modeling,
+* standardized reporting layers,
+* and downstream marts/views.
+
+A separate ingestion process owns:
+
+* file detection,
+* CSV/XLSX parsing,
+* workbook conversion,
+* raw table loading,
+* metadata preservation,
+* and file-level processing workflows.
+
+This separation keeps warehouse logic stable even as source systems evolve.
+
+
+
+# Source File Landing Standards
+
+Raw source files are stored in standardized landing locations before ingestion.
+
+Supported landing patterns include:
 
 ```text
 Google Drive / Shared Drive
 Google Cloud Storage
-Manual upload folder
-SFTP landing folder
+Manual Upload Folder
+SFTP Landing Folder
+API Export Storage
 ```
 
-File metadata to preserve:
+Landing locations preserve original source files before transformation occurs.
 
-| Metadata | Purpose |
+Because once someone overwrites the “corrected final export,” archaeology becomes part of the analytics workflow.
+
+
+
+# Source File Metadata Standards
+
+Every ingested file preserves operational metadata for auditability and traceability.
+
+| Metadata         | Purpose                                     |
 |---|---|
-| `source_file` | Original file name or storage path. |
-| `source_system` | PMS, RMS, CRS, OTA, rate shop, manual, etc. |
-| `source_report` | Report/export name. |
-| `property_code` | Property the file belongs to. |
-| `extract_date` | Date the file was exported. |
-| `load_ts` | Timestamp loaded into raw/staging. |
+| `source_file`    | Original filename or storage path           |
+| `source_system`  | PMS, RMS, CRS, OTA, rate shop, manual, etc. |
+| `source_report`  | Original report/export name                 |
+| `property_code`  | Property associated with the file           |
+| `extract_date`   | Date the report was generated/exported      |
+| `load_ts`        | Timestamp loaded into the warehouse         |
+| `source_file_id` | External file identifier (Drive/GCS/etc.)   |
 
-## 2. Convert Excel when needed
+This metadata layer preserves lineage throughout the ingestion and reporting pipeline.
 
-BigQuery does not natively load `.xlsx` files directly as standard table loads.
 
-Options:
 
-1. Convert Excel tabs to CSV, then load CSV into BigQuery.
-2. Convert Excel to Google Sheets and use a Google Sheets external table.
-3. Use Python / Apps Script / n8n to read Excel and write rows to BigQuery.
-4. Use a cloud function or scheduled loader to convert and load files.
+# Raw & Staging Architecture
 
-## 3. Load raw/staging tables
+## Raw Layer Philosophy
 
-Raw/staging tables should preserve source columns as closely as possible, while still including standard operational metadata.
+Raw tables preserve source-system structures as closely as possible.
 
-Raw table naming:
+The raw layer acts as:
+
+* an ingestion checkpoint,
+* a recovery layer,
+* and a source-of-truth archive for imported operational data.
+
+Raw tables intentionally avoid aggressive transformation logic.
+
+
+
+## Raw Table Standards
 
 ```text
 raw_{source_system}_{source_report}
-stg_{source_system}_{source_report}
 ```
 
 Examples:
@@ -88,261 +183,269 @@ raw_bookingdotcom_bar_price_shop
 raw_bookingdotcom_lowest_price_shop
 ```
 
-## 4. Use Dataform to transform raw/staging into standardized tables
 
-Dataform reads from raw/staging tables and populates standardized tables such as:
 
-```text
-snap_pace_segment
-snap_pace_roomtype
-snap_demand_segment
-snap_demand_source
-fact_price_shop
-fact_manual_plan
-```
+## Staging Layer Philosophy
 
-Example Dataform transform pattern:
+Staging tables normalize:
 
-```sql
-INSERT INTO `${dataform.projectConfig.defaultDatabase}.metrics_pace.snap_pace_segment` (
-  property_code,
-  property_name,
-  snap_date,
-  stay_date,
-  segment,
-  segment_code,
-  segment_map,
-  segment_code_map,
-  rms_otb,
-  rev_otb,
-  rms_stly,
-  rev_stly,
-  source_system,
-  source_report,
-  source_file,
-  insert_date
-)
-SELECT
-  property_code,
-  hotel AS property_name,
-  snapshot_date AS snap_date,
-  SAFE.PARSE_DATE('%Y%m%d', stay_date) AS stay_date,
-  market_segment AS segment,
-  market_code AS segment_code,
-  market_segment AS segment_map,
-  market_code AS segment_code_map,
-  SAFE_CAST(today_rooms_commit AS INT64) AS rms_otb,
-  SAFE_CAST(today_room_revenue_commit AS FLOAT64) AS rev_otb,
-  SAFE_CAST(stly_date_rooms_commit AS INT64) AS rms_stly,
-  SAFE_CAST(stly_date_room_revenue_commit AS FLOAT64) AS rev_stly,
-  'Duetto' AS source_system,
-  'rms-otb-segment' AS source_report,
-  source_file,
-  CURRENT_DATE() AS insert_date
-FROM `${dataform.projectConfig.defaultDatabase}.raw.raw_duetto_rms_otb_segment`;
-```
+* data types,
+* date structures,
+* metric formatting,
+* source-system inconsistencies,
+* and operational naming conventions
 
-## BigQuery Dataset Layout
+before transformation into standardized warehouse models.
 
-Use separate datasets for raw, staging, core reference tables, and domain models.
+Staging preserves enough source structure for traceability while making the data usable for semantic modeling.
 
-```text
-raw
-stg
-metrics_core
-metrics_pace
-metrics_demand
-metrics_booking
-metrics_web
-metrics_finance
-metrics_sales
-metrics_social
-```
 
-| Dataset | Purpose |
+
+# BigQuery Dataset Structure
+
+The Metrics Platform separates datasets by operational domain and architectural responsibility.
+
+| Dataset           | Purpose                                                |
 |---|---|
-| `raw` | Raw file-loaded tables. Preserve original file/source structure. |
-| `stg` | Cleaned/typed staging tables with source columns normalized enough for transformations. |
-| `metrics_core` | Shared dimensions, mappings, and controlled lookup lists. |
-| `metrics_pace` | Pace, pickup, forecast, budget, and snapshot performance tables. |
-| `metrics_demand` | Demand, market, compset, rank, and index data. |
-| `metrics_booking` | Booking engine, CRS, reservation, and pricing/shop data. |
-| `metrics_web` | Website analytics, landing page, GA4, and search data. |
-| `metrics_finance` | Finance, P&L, payroll, expense, and budget data. |
-| `metrics_sales` | Sales activity, accounts, leads, groups, and RFP data. |
-| `metrics_social` | Social engagement, campaign, post, and platform metrics. |
+| `raw`             | Raw source-loaded tables preserving original structure |
+| `stg`             | Typed and normalized staging tables                    |
+| `metrics_core`    | Shared dimensions, mappings, and reference tables      |
+| `metrics_pace`    | Pace, pickup, forecast, and snapshot reporting         |
+| `metrics_demand`  | Demand, benchmarking, comp-set, and index reporting    |
+| `metrics_booking` | Booking engine, CRS, reservation, and pricing data     |
+| `metrics_web`     | Web analytics, landing page, GA4, and search data      |
+| `metrics_finance` | Financial reporting, payroll, budgets, and expenses    |
+| `metrics_sales`   | Sales activity, RFPs, accounts, and lead tracking      |
+| `metrics_social`  | Campaign, engagement, and social platform metrics      |
 
-## CSV Handling
+This separation keeps reporting domains organized while preserving warehouse scalability.
 
-CSV files can be loaded into BigQuery using:
 
-1. BigQuery UI upload.
-2. `bq load` command.
-3. Cloud Storage external tables.
-4. Python / n8n / Apps Script loaders.
-5. Scheduled transfer / ingestion workflow.
 
-CSV load path:
+# CSV Handling Standards
+
+CSV files may be loaded through:
+
+* BigQuery UI uploads,
+* `bq load`,
+* Cloud Storage ingestion,
+* Python loaders,
+* n8n workflows,
+* Apps Script integrations,
+* or scheduled ingestion pipelines.
+
+## Standard CSV Flow
 
 ```text
-CSV file
-  → Google Cloud Storage
-  → BigQuery raw table
-  → Dataform transform
-  → standardized table
+CSV File
+  → Landing Location
+  → Raw BigQuery Table
+  → Staging Layer
+  → Dataform Transformation
+  → Standardized Metrics Tables
 ```
 
-## Excel Handling
 
-Excel files require conversion or a custom loader.
 
-Excel load path:
+# Excel Handling Standards
+
+Excel files require conversion or custom parsing before warehouse ingestion.
+
+The ingestion framework supports:
+
+* workbook tab parsing,
+* tab-level extraction,
+* Google Sheets conversion,
+* Python loaders,
+* Apps Script workflows,
+* and n8n ingestion pipelines.
+
+## Standard Excel Flow
 
 ```text
-Excel file
-  → Python / Apps Script / n8n reads workbook tabs
-  → BigQuery raw table
-  → Dataform transform
-  → standardized table
+Excel File
+  → Workbook Parsing
+  → Raw BigQuery Table
+  → Staging Layer
+  → Dataform Transformation
+  → Standardized Metrics Tables
 ```
 
 Alternative path:
 
 ```text
-Excel file
-  → Google Sheets conversion
-  → BigQuery external table over Google Sheet
-  → Dataform transform
-  → standardized table
+Excel File
+  → Google Sheets Conversion
+  → BigQuery External Table
+  → Dataform Transformation
+  → Standardized Metrics Tables
 ```
 
-## Google Sheets Writeback Handling
-
-For manual forecast and budget data, Google Sheets may remain the user-facing input layer.
-
-Flow:
+Because hospitality reporting still has an intense emotional attachment to Excel tabs named:
 
 ```text
-Google Sheet forecast/budget template
-  → Apps Script / n8n / BigQuery connector
+OTB_FINAL_USE_THIS_v7
+```
+
+
+
+# Google Sheets Writeback Standards
+
+Google Sheets may remain the user-facing planning layer for:
+
+* forecasting,
+* budgeting,
+* overrides,
+* targets,
+* and operational planning workflows.
+
+## Standard Flow
+
+```text
+Google Sheets
+  → Apps Script / n8n / Connector
   → fact_manual_plan
-  → Dataform marts/views
+  → Dataform Marts & Reporting Views
 ```
 
-`fact_manual_plan` preserves Sheet metadata:
+The planning framework preserves:
+
+* user attribution,
+* approval tracking,
+* source sheet lineage,
+* and planning auditability.
+
+
+
+# Dataform Responsibilities
+
+Dataform owns:
+
+* standardized warehouse structures,
+* transformations,
+* semantic modeling,
+* staging logic,
+* dimensional mapping,
+* mart creation,
+* KPI standardization,
+* and reporting-layer calculations.
+
+Examples include:
+
+* pace transformations,
+* benchmark calculations,
+* metric standardization,
+* semantic reporting views,
+* and BI marts.
+
+
+
+# Ingestion Framework Responsibilities
+
+The ingestion framework owns:
+
+* file detection,
+* workbook parsing,
+* CSV/XLSX conversion,
+* raw table loading,
+* metadata preservation,
+* malformed-row handling,
+* processing workflows,
+* and file archival management.
+
+This separation keeps warehouse transformations stable regardless of source-file complexity.
+
+
+
+# Automation Workflow Pattern
+
+A standard automation workflow follows:
 
 ```text
-source_sheet_id
-source_sheet_name
-source_cell
-submitted_by
-submitted_at
-approved_by
-approved_at
+Landing Folder / GCS / Drive Watcher
+  → Ingestion Workflow
+  → File Metadata Extraction
+  → Workbook/CSV Parsing
+  → Raw BigQuery Load
+  → Dataform Execution
+  → File Archival
+  → Success / Failure Notification
 ```
 
-## Dataform Responsibilities
+The ingestion framework parses:
 
-Dataform handles:
+* property,
+* source system,
+* report type,
+* extract date,
+* and operational metadata
 
-1. Creating standardized tables.
-2. Creating staging views or transformation tables.
-3. Mapping raw source columns to standardized names.
-4. Casting values to standard types.
-5. Populating snapshot, fact, and dimension tables.
-6. Building mart and semantic views.
-7. Testing table quality and required fields.
+directly from filenames and workbook structures whenever possible.
 
-## Non-Dataform Responsibilities
 
-Another ingestion process handles:
 
-1. Detecting new files.
-2. Reading CSV and Excel files.
-3. Converting Excel tabs to tabular rows.
-4. Loading raw files into BigQuery raw tables.
-5. Preserving file metadata.
-6. Handling malformed rows and file-level errors.
-7. Moving files to processed/error folders.
+# File Registry Framework
 
-## Automation Pattern
-
-A practical automation pattern:
-
-```text
-Google Drive / GCS watch folder
-  → n8n / Python loader
-  → Parse file name for property, source system, report, extract date
-  → Read CSV/XLSX
-  → Load raw table in BigQuery
-  → Trigger Dataform workflow
-  → Move file to processed folder
-  → Notify success/failure
-```
-
-## File Metadata Table
-
-Create a file registry table to track every loaded file.
-
-Table:
+The Metrics Platform maintains a centralized file registry table:
 
 ```text
 ctl_file_load
 ```
 
-### `ctl_file_load`
+This table tracks:
 
-| Column | Type | Notes |
+* ingestion status,
+* row counts,
+* source lineage,
+* load timestamps,
+* processing outcomes,
+* and archival references.
+
+
+
+# `ctl_file_load`
+
+| Column                | Type      | Notes                                         |
 |---|---|---|
-| `file_load_id` | STRING | Unique file load identifier. |
-| `source_file` | STRING | File name or storage path. |
-| `source_file_id` | STRING | Drive/GCS/file system identifier. |
-| `source_system` | STRING | PMS, RMS, CRS, OTA, rate shop, manual, etc. |
-| `source_report` | STRING | Report/export name. |
-| `property_code` | STRING | Property code. |
-| `extract_date` | DATE | Date the file was extracted/generated. |
-| `load_ts` | TIMESTAMP | Timestamp the file was loaded. |
-| `raw_table` | STRING | Raw BigQuery table loaded. |
-| `row_count` | INT64 | Loaded row count. |
-| `load_status` | STRING | Pending, Loaded, Transformed, Error, Archived. |
-| `error_message` | STRING | Error message, if applicable. |
-| `processed_file_path` | STRING | Processed/archive file path. |
-| `insert_date` | DATE | Insert date. |
-| `updated_date` | DATE | Updated date. |
+| `file_load_id`        | STRING    | Unique file load identifier                   |
+| `source_file`         | STRING    | Original filename or storage path             |
+| `source_file_id`      | STRING    | External Drive/GCS/file identifier            |
+| `source_system`       | STRING    | PMS, RMS, CRS, OTA, etc.                      |
+| `source_report`       | STRING    | Original report/export name                   |
+| `property_code`       | STRING    | Associated property                           |
+| `extract_date`        | DATE      | Report extraction date                        |
+| `load_ts`             | TIMESTAMP | Warehouse load timestamp                      |
+| `raw_table`           | STRING    | Raw table destination                         |
+| `row_count`           | INT64     | Loaded row count                              |
+| `load_status`         | STRING    | Pending, Loaded, Transformed, Error, Archived |
+| `error_message`       | STRING    | Processing error details                      |
+| `processed_file_path` | STRING    | Archived file location                        |
+| `insert_date`         | DATE      | Insert timestamp                              |
+| `updated_date`        | DATE      | Last update timestamp                         |
 
-## Example Dataform DDL for File Registry
 
-```sql
-CREATE TABLE IF NOT EXISTS `${dataform.projectConfig.defaultDatabase}.metrics_core.ctl_file_load` (
-  file_load_id STRING OPTIONS(description="Unique file load identifier."),
-  source_file STRING OPTIONS(description="File name or storage path."),
-  source_file_id STRING OPTIONS(description="Drive, GCS, or file system identifier."),
-  source_system STRING OPTIONS(description="Source system such as PMS, RMS, CRS, OTA, rate shop, or manual."),
-  source_report STRING OPTIONS(description="Report or export name."),
-  property_code STRING OPTIONS(description="Property code."),
-  extract_date DATE OPTIONS(description="Date the file was extracted or generated."),
-  load_ts TIMESTAMP OPTIONS(description="Timestamp the file was loaded."),
-  raw_table STRING OPTIONS(description="Raw BigQuery table loaded."),
-  row_count INT64 OPTIONS(description="Loaded row count."),
-  load_status STRING OPTIONS(description="Pending, Loaded, Transformed, Error, or Archived."),
-  error_message STRING OPTIONS(description="Error message, if applicable."),
-  processed_file_path STRING OPTIONS(description="Processed or archived file path."),
-  insert_date DATE OPTIONS(description="Insert date."),
-  updated_date DATE OPTIONS(description="Updated date.")
-)
-OPTIONS(description="Control table tracking CSV, Excel, Google Sheet, and other source file loads.");
-```
 
-## Bottom Line
+# Warehouse Design Philosophy
 
-Dataform should not be treated as the direct CSV/XLSX loader.
+The Metrics Platform treats source ingestion as an operational intelligence pipeline rather than a simple file-upload process.
 
-Use Dataform to create and transform the database model after files have been loaded to BigQuery raw or staging tables.
+**The architecture intentionally separates:**
 
-Pattern:
+* ingestion,
+* normalization,
+* semantic transformation,
+* benchmark logic,
+* and reporting consumption
 
-```text
-Files in Drive/GCS
-  → Loader writes raw BigQuery tables
-  → Dataform standardizes into Metrics tables
-```
+into independent but connected layers.
+
+**This structure preserves:**
+
+* operational traceability,
+* warehouse stability,
+* reporting consistency,
+* source lineage,
+* and analytical reproducibility.
+
+**The goal is not simply loading files, the goal is creating a reliable operational reporting system from source data that was never designed to work together in the first place.**
+

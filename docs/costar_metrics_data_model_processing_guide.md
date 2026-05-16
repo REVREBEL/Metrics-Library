@@ -1,400 +1,386 @@
-This document defines the required schema, processing logic, and data handling standards for ingesting and transforming CoStar (STR) performance reports into the `metrics_fact_costar` dataset.
+# CoStar STAR Report Processing Standards
 
----
+## REVREBEL Metrics Library & Analytics Warehouse
+
+This document defines the processing standards, schema structure, validation logic, and benchmarking methodology used for CoStar (STR) performance reporting inside the REVREBEL analytics warehouse.
+
+The objective is not simply ingesting STAR reports. The objective is preserving competitive context, benchmark integrity, and historical market behavior across operational reporting, forecasting, and performance analysis.
+
+
+
+# Understanding STAR Reports & Benchmarking Data
+
+The STAR Report, provided by STR (a CoStar Group company), is the hospitality industry’s standard benchmarking framework for measuring hotel performance against a defined competitive set.
+
+Rather than evaluating performance in isolation, STAR reporting measures how a hotel performs relative to its market across occupancy, rate, and revenue efficiency.
+
+For hotel operators, ownership groups, asset managers, and revenue teams, it functions as both a market scorecard and a competitive positioning system.
 
 <br>
-<br>
+
+The report centers around three primary performance metrics:
+
+| Metric | Description |
+|---|---|
+| Occupancy (`occ`) | Percentage of available rooms sold |
+| ADR (`adr`) | Average Daily Rate |
+| RevPAR (`revpar`) | Revenue Per Available Room |
+
+These metrics are benchmarked against a selected competitive set (“compset”) to generate industry-standard index metrics:
+
+| Index | Definition |
+|---|---|
+| MPI | Occupancy Index vs Competitive Set |
+| ARI | ADR Index vs Competitive Set |
+| RGI | RevPAR Index vs Competitive Set |
+
+An index score of:
+
+- `100` represents fair market share
+- `>100` indicates market outperformance
+- `<100` indicates underperformance relative to the comp set
 
 
-## CORE DATA FIELDS
+## How the Report is Generally Used
+**Hotels use STAR reporting to:**
+- evaluate market share,
+- monitor pricing strategy,
+- assess revenue efficiency,
+- benchmark competitive positioning,
+- and identify where performance is gaining or losing ground.
 
-### Property & Metadata Fields
+Unlike transactional PMS data, STAR reporting is observational and benchmark-driven by nature.
+
+**It contains:**
+- market-relative positioning,
+- competitive rankings,
+- snapshot-based comparisons,
+- prior-period benchmarking,
+- index calculations,
+- and comp set relationships that do not always reconcile directly to operational room-night production.
+
+Because of this, the REVREBEL warehouse models CoStar data as a benchmarking and market-intelligence layer rather than a transactional operational dataset.
+
+**The objective is not simply storing performance metrics. The objective is preserving competitive context.**
+
+
+
+# Data Model Philosophy
+
+CoStar data behaves differently than PMS operational reporting.
+
+**Operational systems primarily record transactions:**
+- reservations,
+- room nights,
+- revenue production,
+- guest activity,
+- and inventory movement.
+
+STAR reporting evaluates market-relative performance. That distinction matters.
+
+**The warehouse structure intentionally separates benchmarking logic from operational production data to preserve:**
+
+- historical benchmark continuity,
+- comp set integrity,
+- market-relative calculations,
+- ranking behavior,
+- snapshot comparisons,
+- and forecasting consistency.
+
+Competitive sets evolve over time. Market positioning changes. Benchmarks shift. The warehouse structure is designed to preserve those changes historically rather than flatten or overwrite them.
+
+**Changing the benchmark changes the meaning of the data.**
+
+
+
+# Core Data Fields
+This section defines the required schema, processing logic, and data handling standards for ingesting and transforming CoStar (STR) performance reports into the `metrics_fact_costar` dataset.
+
+## Property & Metadata Fields
 
 | Field | Description |
-|------|-------------|
-| property_code | External lookup (preferred primary identifier) |
-| property_name | External lookup |
-| property_shortname | External lookup |
-| census_id | External lookup |
-| cs_id | External lookup (competitive set identifier) |
-| cs_no | Set01 \| Set02 \| Set03 |
-| cs_reference | External lookup |
-| brand | External lookup |
+|---|---|
+| `property_code` | Standardized property identifier used across REVREBEL systems |
+| `property_name` | Standardized property name |
+| `property_shortname` | Short-form operational property name |
+| `str_id` | STR / CoStar property identifier |
+| `cs_id` | Competitive set identifier |
+| `cs_no` | Competitive set grouping (`Set01`, `Set02`, `Set03`) |
+| `cs_reference` | External competitive set reference |
+| `brand` | Brand classification |
 
----
 
-### Calendar & Date Fields
+
+## Calendar & Date Fields
 
 | Field | Format / Logic |
-|------|----------------|
-| month | Full month name (e.g., January) |
-| month_name | Prior year month name |
-| cy | Current year (YYYY) |
-| py | Prior year (YYYY) |
-| weekday | Full weekday name (e.g., Monday) |
-| weekday_py | Prior year weekday |
-| week_no | Numeric week number |
-| week_no_py | Prior year week number |
-| dow | Day of week abbreviation (SUN–SAT) |
-| day | Day with leading zero (01–31) |
-| stay_date | YYYY-MM-DD (current year) |
-| stay_date_py | YYYY-MM-DD (prior year) |
-| no_days | Number of days represented |
-| no_days_py | Prior year equivalent |
+|---|---|
+| `month` | Full month name |
+| `month_name` | Prior-year month name |
+| `cy` | Current year (`YYYY`) |
+| `ly` | Prior year (`YYYY`) |
+| `weekday` | Full weekday name |
+| `weekday_ly` | Prior-year weekday |
+| `week_no` | Numeric week number |
+| `week_no_ly` | Prior-year week number |
+| `dow` | Day-of-week abbreviation (`SUN–SAT`) |
+| `day` | Day with leading zero (`01–31`) |
+| `date` | Daily reporting grain (`YYYY-MM-DD`) |
+| `date_ly` | Prior-year reporting date |
+| `no_days` | Number of represented days |
+| `no_days_ly` | Prior-year represented days |
 
----
 
-### Capacity & Derived Metrics
+
+# Core Metric Structure
+
+## Primary Metrics
+
+```text
+occ
+adr
+revpar
+```
+
+These metrics serve as the foundational benchmarking layer across property, competitive set, and industry performance reporting.
+
+
+
+# Metric Expansion Logic
+
+## Base Metric Structure
+
+```text
+{metric}
+{metric}_ly
+cs_{metric}
+cs_{metric}_ly
+industry_{metric}
+industry_{metric}_ly
+```
+
+## Percent Change Structure
+
+```text
+{metric}_pct_chg
+cs_{metric}_pct_chg
+industry_{metric}_pct_chg
+```
+
+## Index Structure
+
+```text
+{metric}_index
+{metric}_index_ly
+cs_{metric}_index
+industry_{metric}_index
+```
+
+## Ranking Structure
+
+```text
+{metric}_rank
+{metric}_pct_chg_rank
+```
+
+The warehouse structure keeps related metric families grouped together logically while preserving semantic consistency across reporting layers.
+
+
+
+# Derived Metrics
+
+## Capacity & Revenue Calculations
 
 | Field | Formula |
-|------|--------|
-| available_rooms | External lookup |
-| cs_available_rooms | External lookup |
-| rms | ROUND(occ * (rooms_available / 100)) |
-| rms_py | ROUND(occ_py * (rooms_available_py / 100)) |
-| cs_rms | ROUND(cs_occ * (cs_rooms_available / 100)) |
-| cs_rms_py | ROUND(cs_occ_py * (cs_rooms_available_py / 100)) |
-| rev | rms * adr |
-| rev_py | rms_py * adr_py |
-| cs_rev | cs_rms * cs_adr |
-| cs_rev_py | cs_rms_py * cs_adr_py |
+|---|---|
+| `rms` | `ROUND(occ * (available_rms / 100))` |
+| `rms_ly` | `ROUND(occ_ly * (available_rms_ly / 100))` |
+| `cs_rms` | `ROUND(cs_occ * (cs_available_rms / 100))` |
+| `cs_rms_ly` | `ROUND(cs_occ_ly * (cs_available_rms_ly / 100))` |
+| `rev` | `rms * adr` |
+| `rev_ly` | `rms_ly * adr_ly` |
+| `cs_rev` | `cs_rms * cs_adr` |
+| `cs_rev_ly` | `cs_rms_ly * cs_adr_ly` |
 
----
 
-<br>
-<br>
 
-## REQUIRED METRIC STRUCTURE
+# Competitive Set Handling
 
-### Primary Metrics
+STAR reports may contain multiple competitive sets.
 
-```
-metrics = occ | adr | revpar
-```
+Competitive sets are identified using suffix-based segmentation:
 
-### Source Data Mapping
-
-| Metric | Source Tab |
-|--------|------------|
-| occ | Occ |
-| adr | ADR |
-| revpar | RevPAR |
-
----
-
-<br>
-<br>
-
-## COMPETITIVE SET HANDLING
-
-- Reports may contain multiple competitive sets
-- Identified via suffix:
-
-```
-_1 | _2 | _3
+```text
+_1
+_2
+_3
 ```
 
-Each competitive set must be:
-- Processed independently
-- Exported as a separate dataset
-- Mapped to `cs_no` (Set01, Set02, Set03)
+Mapped internally as:
 
----
-
-<br>
-<br>
-
-## METRIC EXPANSION LOGIC
-
-### Base Pattern
-
-```
-{{metric}}
-{{metric}}_py
-cs_{{metric}}
-cs_{{metric}}_py
-industry_{{metric}}
-industry_{{metric}}_py
+```text
+Set01
+Set02
+Set03
 ```
 
-### Prior Year Calculation
-```
-PY = TY / (1 + pct_chg)
-```
+Each competitive set:
+- processes independently,
+- maintains separate benchmark continuity,
+- preserves historical positioning,
+- and supports independent ranking and index calculations.
 
-### Percent Change Fields
-```
-{{metric}}_pct_chg
-cs_{{metric}}_pct_chg
-industry_{{metric}}_pct_chg
-```
-
-### Index Calculations
-```
-{{metric}}_index
-{{metric}}_index_py
-cs_{{metric}}_index
-cs_{{metric}}_index_py
-industry_{{metric}}_index
-industry_{{metric}}_index_py
-```
-
-> Note: Index values typically represent relative performance vs comp set or industry.
-
-### Ranking Fields
-```
-{{metric}}_rank
-{{metric}}_pct_chg_rank
-```
-
----
-
-<br>
-<br>
+The warehouse intentionally treats comp sets as independent benchmarking contexts rather than interchangeable reporting dimensions.
 
 
-##  PROPERTY IDENTIFICATION LOGIC
 
-To facilitate easier identification compared to the standard 3-6 digit STR ID, hotels can request a unique 6-character "property_code" be appended to the CoStar report filename.
+# Property Identification Logic
 
-<br>
+Property identification follows a structured fallback hierarchy designed to maintain ingestion reliability and benchmark continuity.
 
-### File Processing Logic
+## Primary Identification Method
 
-When processing the file, the system can identify the property and/r property_code using one of three fallback methods:
-
-### 1. Primary (Preferred)
-
-- Extract 6-character `property_code` from filename
-- Example: `MSPHEH`
-
-If the filename contains a 6-character property code (e.g., "MSPHEH"), it must be parsed and recorded as a global variable for that notebook session.
-
-### 2. Secondary
-
-- Extract STR ID
-
-Secondary Method: If no property code is present, the STR ID should be parsed as an alternative lookup reference.
-Tertiary Method: If neither code is available, the process should locate and use the hotel name. This ensures that the data team can successfully complete their initial tasks.
-
-### 3. Tertiary
-
-- Match using `property_name`
-
-Once the property has been identified via one of these methods, the process can proceed to query the metrics_fact_costar table using the column references detailed below. This value is stored as a session-level variable and used throughout processing.
-
----
-
-<br>
-<br>
-
-# DATA MANAGEMENT AND VALIDATION
-This identifier, along with other critical metadata, is maintained in the metrics_fact_costar table. During the processing of CoStar data, this key must be verified against every response tab to ensure it aligns with the fact table. This alignment is essential for calculations that rely on the total room count within the current competitive set.
-
-To simplify identification, each cs_id is mapped to a cs_no (e.g., Set01, Set02), allowing for easy reference within the dataset. It should also correspond with the the suffix identifier on each tab after the tab name.
-
-## Potential Change Scenarios
-
-There are two primary scenarios regarding competitive set adjustments:
-
-** Scenario 1: Set Reclassification.  **
-
-A hotel might move a tertiary set (Set03) to its primary position. This changes the benchmark comparisons for the initial CoStar report tabs (labeled "_1"). The system identifies this through cs_id validation.
-
-
-** Scenario 2:  **
-
-Component Modification. If a hotel alters the actual components of its competitive set, a new entry must be created in the metrics_fact_costar table to properly record and align the updated set.
-
-When a match is found, the process will be able to match the row and pull the meta data for the required columns below.
-
----
-
-<br>
-<br>
-
-
-## DATA VALIDATION REQUIREMENTS
-
-- Every processed row must validate against `metrics_fact_costar`
-- Ensure:
-  - `cs_id` matches expected competitive set
-  - Property metadata aligns with fact table
-  - Room counts match for comp set calculations
-
-> This is critical for accurate index and ranking calculations.
-
----
-
-<br>
-<br>
-
-## COMPETITIVE SET CHANGE SCENARIOS
-
-### Scenario 1: Set Reclassification
-
-- Example: Set03 becomes Set01
-- Impact: Benchmark shifts
-- Detection: Change in `cs_id`
-
-### Scenario 2: Component Modification
-
-- Competitive set composition changes
-- Action required:
-  - Insert new record in `metrics_fact_costar`
-  - Maintain historical continuity
-
----
-
-<br>
-<br>
-
-## METADATA ENRICHMENT FIELDS
-
-Once property + comp set match is confirmed, enrich with:
-
-- property_code
-- property_name
-- property_shortname
-- brand
-- cs_id
-- cs_no
-- cs_reference
-- physical_capacity
-- cs_physical_capacity
-- rms / rms_py
-- cs_rms / cs_rms_py
-- rev
-
----
-
-<br>
-<br>
-
-## COMPETITIVE SET ID DEFINITION
-
-```
-cs_id = STR IDs concatenated with hyphens
-```
-
-![alt](https://raw.githubusercontent.com/REVREBEL/Metrics-Library/main/assets/creating-the-unique-cs-id.png)
-
+Extract `property_code` from the filename.
 
 Example:
+
+```text
+MSPHEH
 ```
-65206-54429-55653-44555-56751-39388
+
+
+
+## Secondary Identification Method
+
+Extract STR / CoStar identifier (`str_id`).
+
+
+
+## Tertiary Identification Method
+
+Match against standardized `property_name`.
+
+Once identified, the property reference becomes the session-level lookup key throughout processing and validation.
+
+
+
+# Validation Standards
+
+Every processed row validates against the standardized CoStar reference layer.
+
+Validation includes:
+- property alignment,
+- competitive set alignment,
+- capacity consistency,
+- metadata integrity,
+- ranking continuity,
+- and index calculation stability.
+
+This validation layer exists to prevent silent reporting drift across dashboards and downstream analytics.
+
+Because benchmarking data has a remarkable ability to fail quietly right before someone screenshots it for ownership.
+
+
+
+# Competitive Set Change Scenarios
+
+## Scenario 1 — Set Reclassification
+
+A hotel reorders an existing competitive set hierarchy.
+
+Example:
+
+```text
+Set03 → Set01
 ```
 
-> This uniquely defines the comp set composition.
+This changes benchmark relationships and index interpretation.
 
----
-
-<br>
-<br>
+Detection occurs through `cs_id` validation.
 
 
-## WEEK NUMBER LOGIC
 
-- Week Starts: Sunday
-- Week 1: Contains January 1
-- Increment: Each Sunday increases week number
+## Scenario 2 — Competitive Set Composition Change
 
-> Note: This differs from ISO week standards (Monday-based).
+The actual members of the competitive set change.
 
----
+When this occurs:
+- a new competitive set record is created,
+- historical continuity is preserved,
+- prior benchmark relationships remain intact,
+- and reporting logic maintains separation between benchmark versions.
 
-<br>
-<br>
+Benchmark history remains historically accurate rather than retroactively rewritten.
 
-## TABLE SCHEMA
 
+
+# Week Logic
+
+Week structure follows hospitality reporting standards rather than ISO week standards.
+
+- Week starts on Sunday
+- Week 1 contains January 1
+- Each Sunday increments the week number
+
+This aligns reporting behavior with standard STR operational reporting.
+
+
+
+# Warehouse Naming Standards
+
+The CoStar reporting pipeline follows the REVREBEL warehouse naming framework.
+
+| Object Type | Standard |
+|---|---|
+| Fact tables | `metrics_fact_*` |
+| Views | `vw_metrics_*` |
+| Snapshot tables | `snap_metrics_*` |
+| Dimensions | `dim_*` |
+
+Examples:
+
+```text
 metrics_fact_costar
+vw_metrics_costar_daily
+snap_metrics_costar
+dim_property
+dim_comp_set
+```
 
-| Field | Type | Description |
-|------|------|-------------|
-| index | INTEGER | Sequential identifier |
-| property_code | STRING | Property identifier |
-| census_id | INTEGER | Census identifier |
-| cs_no | STRING | Comp set label |
-| cs_reference | STRING | Comp set reference |
-| chain_id | STRING | Hotel chain identifier |
-| property_name | STRING | Property name |
-| brand | STRING | Brand classification |
-| city | STRING | City |
-| state | STRING | State |
-| country | STRING | Country |
-| available_rms | INTEGER | Available rooms |
-| open_date | INTEGER | Opening date |
-| cs_type | STRING | Comp set type |
-| cs_owner | STRING | Comp set owner |
-| compliance_status | STRING | Compliance status |
-| delete_on_date | INTEGER | Deletion marker |
-| cs_status | STRING | Comp set status |
-| cs_census_id | INTEGER | Comp set census ID |
-| cs_property_name | STRING | Comp set property |
-| cs_brand | STRING | Comp set brand |
-| cs_city | STRING | Comp set city |
-| cs_state | STRING | Comp set state |
-| cs_country | STRING | Comp set country |
-| cs_rms | INTEGER | Comp set rooms |
-| cs_open_date | INTEGER | Comp set open date |
-| creation_date | INTEGER | Record creation date |
-| legacy_position | INTEGER | Historical position |
-| cs_available_rms | INTEGER | Comp set available rooms |
 
----
 
-<br>
-<br>
+# Data Pipeline Flow
 
-##  ADDITIONAL IMPLEMENTATION NOTES
-
-### A. Recommended Naming Conventions
-
-- Fact table: `metrics_fact_costar`
-- Derived views: `vw_metrics_*`
-- Snapshot tables: `snap_metrics_*`
-- Dimensions: `dim_property`, `dim_comp_set`
-
----
-
-### B. Minimum Required Base Metrics (Best Practice)
-
-To ensure reproducibility of all calculations, always store:
-
-- rooms_available
-- rooms_sold (derived from RMS if needed)
-- room_revenue
-
-This allows recompilation of:
-- Occupancy
-- ADR
-- RevPAR
-- Index values
-- YoY comparisons
-
----
-
-### C. Data Pipeline Guidance
-
-Recommended flow:
-
-1. Ingest raw Excel
-2. Normalize tabs (Occ / ADR / RevPAR)
+```text
+1. Ingest raw CoStar export
+2. Normalize OCC / ADR / RevPAR tabs
 3. Flatten into row-based structure
-4. Apply comp set segmentation
-5. Calculate PY + index metrics
-6. Validate against fact table
-7. Load into BigQuery
+4. Apply competitive set segmentation
+5. Expand LY, index, and ranking metrics
+6. Validate against reference tables
+7. Load into warehouse
+```
 
----
+The pipeline prioritizes:
+- reproducibility,
+- benchmark integrity,
+- traceability,
+- semantic consistency,
+- and reporting stability.
 
-### D. Common Failure Points
 
-- Missing property_code in filename
-- Misaligned comp set (`cs_id` mismatch)
-- Incorrect PY calculation when pct_chg is null
-- Week number inconsistencies
-- Duplicate rows across comp sets
 
----
+# Common Failure Points
+
+| Issue | Impact |
+|---|---|
+| Missing `property_code` | Property matching failure |
+| Invalid `cs_id` | Benchmark corruption |
+| Partial report tabs | Incomplete metric expansion |
+| Null percentage changes | Invalid LY calculations |
+| Week logic inconsistency | Reporting drift |
+| Duplicate comp set rows | Ranking distortion |
+
+These conditions are monitored because hospitality benchmarking data rarely fails loudly. It usually fails quietly and expensively.
+
+
