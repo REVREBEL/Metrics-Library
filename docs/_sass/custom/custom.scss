@@ -3,14 +3,43 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Khand:wght@300;400;500;600;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
-:root {
-  --rr-navy: #163666;
-  --rr-teal: #047c97;
-  --rr-bright-teal: #00a6b6;
-  --rr-mint: #71c9c5;
-  --rr-ice: #eff5f6;
-  --rr-coral: #e05047;
-  --rr-page-bg: #fafafa;
+:root {    
+    --primary: #163666;
+    --dark-green: #047c97;
+    --light-green: #00a6b6;
+    --green: #71c9c5;
+    --smoke: #eff5f6;
+    --red: #e05047;
+    --light: #fafafa;
+    --white: 
+    
+    
+    --foreground: var(--primary);
+    --forground-muted: #666666;
+    --background: var(--light);
+    
+    --accent-1: var(--green);
+    --accent-2: var(--smoke);
+    --accent-3: var(--light-green);    
+    
+    --table-foreground: var(--primary);
+    --table-background: #ffffff;
+    --blockquote-accent: #666666;
+    
+    
+    --blockquote-foreground #000000;
+    --blockquote-background: #f3f3f3;
+    --blockquote-accent: #666666;
+    
+    --code-foreground: var(--light);
+    --code-background: var(--primary);
+    --code-accent: var(--smoke);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
 }
 
 html,
@@ -19,22 +48,27 @@ body {
 }
 
 body {
-  font-family: "Roboto", helvetica, arial, sans-serif;
-  font-weight: 300;
-  color: var(--rr-navy);
+    font-family: "Roboto", helvetica, arial, sans-serif;
+    font-weight: 300;
+    color: var(--foreground);
+    font-size: 16px;
+    color: #163666;
+    line-height: 1.4em;
+    background-color: var(--background);
+    padding: 0.7em;
 }
 
 .side-bar,
 .site-header,
 .main-header {
-  background-color: var(--rr-page-bg);
+    background-color: var(--background);
 }
 
 .site-title,
 .site-button,
 .nav-list .nav-list-item .nav-list-link,
 .nav-list .nav-list-item .nav-list-link.active {
-  color: var(--rr-navy);
+    color: var(--foreground);
 }
 
 .site-title {
@@ -46,7 +80,7 @@ body {
 
 .main-content-wrap,
 .main-content {
-  background-color: var(--rr-page-bg);
+    background-color: var(--background);
 }
 
 .main-content {
@@ -54,7 +88,7 @@ body {
   font-weight: 300;
   font-size: 16px;
   line-height: 1.5em;
-  color: var(--rr-navy);
+  color: var(--background);
 }
 
 .main-content p {
@@ -62,9 +96,13 @@ body {
   line-height: 1.5em;
 }
 
+.main-content p + p {
+    margin-top: 20px;
+}
+
 .main-content a {
-  color: var(--rr-bright-teal);
-  text-decoration: none;
+    color: var(--accent-3);
+    text-decoration: none;
 }
 
 .main-content a:hover {
@@ -77,7 +115,8 @@ body {
 .main-content h4,
 .main-content h5,
 .main-content h6 {
-  color: var(--rr-navy);
+  border-top: none !important;
+  color: var(--foreground);
   font-family: "Khand", "Roboto", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -127,49 +166,51 @@ body {
 }
 
 .main-content table {
-  font-size: inherit;
-  margin: 1em 0;
-  border-collapse: collapse;
-  width: 100%;
+    font-size: inherit;
+    font: 100%;
+    margin: 1em 1em 1em 1em;
+    border-collapse: collapse;
+    width: 100%;
+    box-shadow: none;
 }
 
 .main-content table th {
-  font-family: "Khand", sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--rr-navy);
-  padding: 0.2em 1em;
-  color: var(--rr-navy);
-  text-align: left;
-  background-color: transparent;
+    font-family: "Khand", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--table-foreground);
+    padding: 0.2em 1em;
+    color: var(--foreground);
+    text-align: left;
+    background-color: var(--table-background);
 }
 
 .main-content table td {
-  border-bottom: 1px solid #ddd;
-  padding: 0.2em 1em;
-  color: var(--rr-navy);
-  background-color: transparent;
+    border-bottom: 1px solid #ddd;
+    padding: 0.2em 1em;
+    color: var(--table-foreground);
+    background-color: var(--table-background);
 }
 
 .main-content pre,
 .main-content div.highlighter-rouge,
 .main-content figure.highlight {
-  margin: 1em 0;
-  padding: 1rem !important;
-  background-color: var(--rr-navy) !important;
-  border: 1px solid var(--rr-navy) !important;
-  border-radius: 0;
+    margin: 1em 0;
+    padding: 1rem !important;
+    background-color: var(--code-background) !important;
+    border: 1px solid var(--code-background) !important;
+    border-radius: 0;
 }
 
 .main-content div.highlighter-rouge div.highlight,
 .main-content figure.highlight div.highlight,
 .main-content .highlight {
-  overflow-x: auto;
-  padding: 0 !important;
-  margin: 0;
-  background-color: var(--rr-navy) !important;
-  border: 0 !important;
-  border-radius: 0;
+    overflow-x: auto;
+    padding: 0 !important;
+    margin: 0;
+    background-color: var(--code-background) !important;
+    border: 0 !important;
+    border-radius: 0;
 }
 
 .main-content .highlighter-rouge pre,
@@ -179,8 +220,8 @@ body {
   margin: 0;
   font-size: 16px;
   line-height: 1.5em;
-  color: var(--rr-ice) !important;
-  background-color: var(--rr-navy) !important;
+  color: var(--code-accent) !important;
+  background-color: var(--code-background) !important;
   padding: 0 !important;
   overflow: auto;
   box-shadow: none;
@@ -196,7 +237,7 @@ body {
   font-family: "Fira Code", helvetica, arial, sans-serif;
   font-weight: 400;
   font-size: 14px;
-  color: var(--rr-ice) !important;
+  color: var(--code-accent) !important;
   background-color: transparent !important;
   border: none;
   text-transform: none;
@@ -206,10 +247,10 @@ body {
   font-family: "Fira Code", helvetica, arial, sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: var(--rr-navy);
-  background-color: var(--rr-ice);
+  color: var(--code-background);
+  background-color: var(--code-accent);
   padding: 0 0.2em;
-  border: 1px solid var(--rr-ice);
+  border: 1px solid var(--code-accent);
   border-radius: 0;
   text-transform: none;
 }
@@ -217,7 +258,7 @@ body {
 .main-content a code,
 .main-content a:link code,
 .main-content a:visited code {
-  color: var(--rr-teal);
+    color: var(--accent-1);
 }
 
 .main-content ul,
@@ -233,7 +274,7 @@ body {
 
 .main-content blockquote {
   margin: 3em 2em;
-  border-left: 5px solid var(--rr-teal);
+  border-left: 5px solid var(--accent-1);
   line-height: 1.5;
   padding: 0.15em 0 0.15em 1em;
   font-weight: 300;
@@ -269,7 +310,7 @@ body {
 
 .label,
 .btn-primary {
-  background-color: var(--rr-navy);
+  background-color: var(--foreground);
 }
 
 @media print {
@@ -282,3 +323,4 @@ body {
     word-wrap: break-word;
   }
 }
+
