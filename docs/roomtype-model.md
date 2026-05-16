@@ -96,7 +96,7 @@ lkp_roomfeature
 |---|---|---|
 | `VIEW` | View | Room has a meaningful view premium. |
 | `BALC` | Balcony | Room includes a balcony or terrace. |
-| `ACC` | Accessible | Accessible room configuration. |
+| `ADA` | Accessible | Accessible room configuration. |
 | `FIRE` | Fireplace | Room includes fireplace as a selling feature. |
 | `NONE` | None | No primary feature assigned. |
 
