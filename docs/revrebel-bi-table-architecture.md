@@ -1,13 +1,13 @@
 ---
-title: REVREBEL BI Table Architecture
+title: Metrics Table Architecture
 nav_order: 3
 has_toc: true
-permalink: /revrebel-bi-table-architecture/
+permalink: /metrics-table-architecture/
 ---
 
-# REVREBEL BI Table Architecture
+# Metrics Table Architecture
 
-This document maps the proposed standard table structure for the REVREBEL BI Platform. The goal is to maintain a stable set of standardized tables and columns that can power dashboards even when source reports arrive from different PMS, RMS, CRS, booking engine, and reporting systems with inconsistent formats and metric availability.
+This document defines the standard table structure for Metrics. The goal is to maintain a stable set of standardized tables and columns that can power reporting, dashboards, and analysis even when source reports arrive from different PMS, RMS, CRS, booking engine, and reporting systems with inconsistent formats and metric availability.
 
 ## Design Principles
 
@@ -171,7 +171,7 @@ This document maps the proposed standard table structure for the REVREBEL BI Pla
 | `bedtype_code` | STRING | Standard room type code. |
 | `roomclass` | STRING | Room class/category. |
 | `roomfeature` | STRING | Primary Feature, size, view, amenity. |
-| `related_roomtypes` | STRING | Room types that share ideinital feaures but may be seperated by bedtype or floor |
+| `related_roomtypes` | STRING | Room types that share identical features but may be separated by bedtype or floor. |
 | `available_rms` | INT64 | Default inventory for the roomtype, if stable. |
 | `roomtype_sort` | INT64 | BI sort order. |
 | `is_active` | BOOL | Active flag. |
