@@ -162,6 +162,11 @@ body {
   margin-top: 0.5em !important;
 }
 
+
+.main-content .table-wrapper {
+    border-radius: 2px;
+    box-shadow: none;
+}
 .main-content table {
     font-size: inherit;
     font: 100%;
@@ -186,6 +191,14 @@ body {
     padding: 0.2em 1em;
     color: var(--table-foreground);
     background-color: var(--table-background);
+}
+
+.main-content .highlight .n {
+    color: var(--accent-2);
+}
+    
+.main-content .highlight .k {
+    color: var(--accent-3);
 }
 
 .main-content pre,
