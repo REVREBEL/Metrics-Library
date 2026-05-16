@@ -126,7 +126,6 @@ property_code + system + report + name
 |---|---|---|
 | `property_code` | STRING | Property code. |
 | `system` | STRING | Source system providing the roomtype value. |
-| `report` | STRING | Source report or feed where the roomtype appeared. |
 | `code` | STRING | Source-system roomtype code. |
 | `name` | STRING | Source-system roomtype name or label. |
 | `description` | STRING | Source-system roomtype description, if supplied. |
@@ -287,7 +286,7 @@ A room pool can represent interchangeable roomtypes, a strategic grouping, or a 
 | `description` | STRING | Roompool description or usage notes. |
 | `related_roomtypes` | STRING | Comma-separated list of roomtype codes included in the pool. |
 | `roompool` | STRING | Source or mapped roompool grouping label. |
-| `sort_order` | INT64 | Optional display order. |
+| `sort` | INT64 | Optional display order. |
 | `is_active` | BOOL | Indicates whether the roompool is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
@@ -360,6 +359,7 @@ Example output:
 | `roomfeature_description` | `lkp_roomfeature.description` | Room feature description. |
 | `roompool` | `dim_roomtype.roompool` | Roompool grouping label. |
 | `available_rms` | `dim_roomtype.available_rms` | Roomtype inventory. |
+| `sort` | INT64 | Optional display order. |
 | `is_active` | `dim_roomtype.is_active` | Active flag. |
 
 ### `vw_roompool`
@@ -373,6 +373,7 @@ Example output:
 | `roompool` | `dim_roompool.name` | Roompool name. |
 | `roompool_description` | `dim_roompool.description` | Roompool description. |
 | `related_roomtypes` | `dim_roompool.related_roomtypes` | Comma-separated roomtype codes in the pool. |
+| `sort` | INT64 | Optional display order. |
 | `is_active` | `dim_roompool.is_active` | Active flag. |
 
 ---
@@ -411,5 +412,5 @@ The reporting layer can join to `vw_roomtype` to bring in room category, room cl
 6. `dim_roompool` groups roomtype codes into strategic or interchangeable room pools.
 7. `vw_roomtype` and `vw_roompool` provide the readable version for dashboards, QA, and exports.
 8. Use `roomcategory_code`, not `roomcategory`, in modeled tables. Labels belong in lookup joins and views.
-9. Use `no_beds`, not `no_rooms`, when the value means bed count.
+9. Use `0`, not `no_rooms`, when the value means bed count.
 10. Generated codes should be deterministic. Same attributes in, same code out. Always.
