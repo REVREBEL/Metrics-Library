@@ -32,8 +32,8 @@ The model starts with independent lookup tables, maps source room values into st
 | `map_roomtype` | Source-to-standard mapping table used to classify source-system roomtype values. |
 | `dim_roomtype` | Production roomtype reference used by ingestion, facts, snapshots, and reporting. |
 | `dim_roompool` | Standard roompool dimension used to group interchangeable or strategically related roomtypes. |
-| `vw_roomtype` | Enriched view that joins the dimension to lookup labels and descriptions. |
-| `vw_roompool` | Enriched view that expands roompool groupings into readable roomtype relationships. |
+| `vw_roomtype` | Enriched view that joins the dimension to lookup labels, descriptions, and sort order. |
+| `vw_roompool` | Enriched view that expands roompool groupings into readable roomtype relationships and sort order. |
 
 ---
 
@@ -57,7 +57,7 @@ lkp_roomfeature
 | `code` | STRING | Standard lookup code. |
 | `name` | STRING | Display name. |
 | `description` | STRING | Definition or usage notes. |
-| `sort` | INT64 | Optional display order. |
+| `sort` | INT64 | Display order for reporting. |
 | `is_active` | BOOL | Indicates whether the lookup value is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
@@ -106,18 +106,20 @@ lkp_roomfeature
 
 `map_roomtype` is the source-to-standard translation layer. It stores the roomtype value as it appears in a source system and maps it into the standard room attributes used to create `dim_roomtype`.
 
+The mapping is universal by property and system. It is not tied to a specific ingestion report because the same source roomtype can appear across multiple files, tabs, exports, and workflows. The report that delivered the value belongs in ingestion/file metadata, not in the mapping table.
+
 The source fields in this table use plain names because the table itself provides the context. Inside `map_roomtype`, `code`, `name`, and `description` mean the mapped source roomtype code, name, and description.
 
 ### Grain
 
 ```text
-property_code + system + report + code
+property_code + system + code
 ```
 
 If a source system does not provide a reliable code, the effective grain may use:
 
 ```text
-property_code + system + report + name
+property_code + system + name
 ```
 
 ### Columns
@@ -188,7 +190,6 @@ The full source context remains in `map_roomtype`:
 
 ```text
 map_roomtype.system
-map_roomtype.report
 map_roomtype.code
 map_roomtype.name
 map_roomtype.description
@@ -237,7 +238,7 @@ The shorter format is easier to read. The stricter format is easier to audit. Pi
 | `roomfeature_code` | STRING | Standard primary room feature code. |
 | `roompool` | STRING | Optional roompool grouping label. |
 | `available_rms` | INT64 | Room inventory for the roomtype, when stable and known. |
-| `sort` | INT64 | Optional display order. |
+| `sort` | INT64 | Display order for reporting. |
 | `is_active` | BOOL | Indicates whether the roomtype is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
@@ -286,7 +287,7 @@ A room pool can represent interchangeable roomtypes, a strategic grouping, or a 
 | `description` | STRING | Roompool description or usage notes. |
 | `related_roomtypes` | STRING | Comma-separated list of roomtype codes included in the pool. |
 | `roompool` | STRING | Source or mapped roompool grouping label. |
-| `sort` | INT64 | Optional display order. |
+| `sort` | INT64 | Display order for reporting. |
 | `is_active` | BOOL | Indicates whether the roompool is active. |
 | `insert_date` | DATE | Insert date. |
 | `updated_date` | DATE | Updated date. |
@@ -333,6 +334,8 @@ Example output:
 
 ## Enriched Views
 
+Views expose sort fields so BI tools can display roomtypes, room pools, and lookup labels in the intended operating order instead of alphabetizing everything into polite nonsense.
+
 ### `vw_roomtype`
 
 `vw_roomtype` joins the standard roomtype dimension to lookup labels and descriptions.
@@ -359,7 +362,7 @@ Example output:
 | `roomfeature_description` | `lkp_roomfeature.description` | Room feature description. |
 | `roompool` | `dim_roomtype.roompool` | Roompool grouping label. |
 | `available_rms` | `dim_roomtype.available_rms` | Roomtype inventory. |
-| `sort` | INT64 | Optional display order. |
+| `sort` | `dim_roomtype.sort` | Display order for BI/reporting. |
 | `is_active` | `dim_roomtype.is_active` | Active flag. |
 
 ### `vw_roompool`
@@ -373,7 +376,7 @@ Example output:
 | `roompool` | `dim_roompool.name` | Roompool name. |
 | `roompool_description` | `dim_roompool.description` | Roompool description. |
 | `related_roomtypes` | `dim_roompool.related_roomtypes` | Comma-separated roomtype codes in the pool. |
-| `sort` | INT64 | Optional display order. |
+| `sort` | `dim_roompool.sort` | Display order for BI/reporting. |
 | `is_active` | `dim_roompool.is_active` | Active flag. |
 
 ---
@@ -400,17 +403,17 @@ fact_price_shop.roomtype_code
 snap_demand_roomtype.roomtype_code
 ```
 
-The reporting layer can join to `vw_roomtype` to bring in room category, room class, bed type, feature labels, and the mapped roomtype lookup code.
+The reporting layer can join to `vw_roomtype` to bring in room category, room class, bed type, feature labels, sort order, and the mapped roomtype lookup code.
 
 ## Operating Notes
 
 1. `lkp_` tables define controlled values. They do not know anything about a specific property.
 2. `map_roomtype` translates and governs source-system room values before they are published into the production dimension.
-3. `map_roomtype` uses `system`, `report`, `code`, `name`, and `description`; it does not use the `source_` prefix because the table context already makes those fields source-oriented.
-4. `dim_roomtype` carries `map_roomtype_code` as the single lookup back to the mapped source roomtype code.
-5. `dim_roomtype` should not carry `system`, `report`, `name`, or `description` from the mapping table unless a future use case requires a deliberate denormalized export.
+3. `map_roomtype` uses `system`, `code`, `name`, and `description`; it does not use the `source_` prefix because the table context already makes those fields source-oriented.
+4. Mapping tables do not include `report`; source reports belong in ingestion metadata because the same mapping may support multiple ingestion files.
+5. `dim_roomtype` carries `map_roomtype_code` as the single lookup back to the mapped source roomtype code.
 6. `dim_roompool` groups roomtype codes into strategic or interchangeable room pools.
-7. `vw_roomtype` and `vw_roompool` provide the readable version for dashboards, QA, and exports.
+7. `vw_roomtype` and `vw_roompool` expose sort fields so reporting tools display values in the intended order.
 8. Use `roomcategory_code`, not `roomcategory`, in modeled tables. Labels belong in lookup joins and views.
-9. Use `0`, not `no_rooms`, when the value means bed count.
+9. Use `no_beds`, not `no_rooms`, when the value means bed count.
 10. Generated codes should be deterministic. Same attributes in, same code out. Always.
