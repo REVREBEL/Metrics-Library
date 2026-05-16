@@ -27,9 +27,9 @@
     --blockquote-accent: #666666;
     
     
-    --blockquote-foreground #000000;
+    --blockquote-foreground: var(--green);
     --blockquote-background: #f3f3f3;
-    --blockquote-accent: #666666;
+    --blockquote-accent: var(--light-green);
     
     --code-foreground: var(--light);
     --code-background: var(--primary);
@@ -278,7 +278,7 @@ body {
   line-height: 1.5;
   padding: 0.15em 0 0.15em 1em;
   font-weight: 300;
-  color: var(--rr-bright-teal);
+  color: var(--accent-1);
   text-transform: lowercase;
   font-family: "Poppins", "Roboto", sans-serif;
 }
