@@ -44,10 +44,10 @@
 
 html,
 body {
-  background-color: var(--rr-page-bg);
+  background-color: var(--background);
 }
 
-body {
+.main-content body {
     font-family: "Roboto", helvetica, arial, sans-serif;
     font-weight: 300;
     color: var(--foreground);
@@ -88,7 +88,7 @@ body {
   font-weight: 300;
   font-size: 16px;
   line-height: 1.5em;
-  color: var(--background);
+  color: var(--foreground);
 }
 
 .main-content p {
