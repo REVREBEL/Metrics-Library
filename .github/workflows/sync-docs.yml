@@ -5,8 +5,8 @@
 # against REVREBEL/docs that drops them into a per-repo subfolder.
 #
 # Required secret on the source repo:
-#   DOCS_SYNC_TOKEN  - a fine-grained PAT (or GitHub App token) with
-#                      contents:write + pull-requests:write on REVREBEL/docs.
+#   METRICS_LIBRARY_DOCS_SYNC_TOKEN - a fine-grained PAT or GitHub App token with
+#                                    contents:write + pull-requests:write on REVREBEL/docs.
 
 name: Sync docs to REVREBEL/docs
 
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.DOCS_REPO }}
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ secrets.METRICS_LIBRARY_DOCS_SYNC_TOKEN }}
           path: docs-repo
 
       - name: Sync .md -> .mdx into ${{ env.TARGET_DIR }}/
@@ -72,7 +72,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           path: docs-repo
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ secrets.METRICS_LIBRARY_DOCS_SYNC_TOKEN }}
           branch: sync/${{ github.event.repository.name }}
           base: ${{ env.DOCS_BRANCH }}
           commit-message: "docs: sync ${{ github.event.repository.name }} (${{ github.sha }})"
