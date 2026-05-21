@@ -32,7 +32,10 @@ Icon
 .cache
 
 # --- Security & Credentials ---
-*.json
+*credentials*.json
+*secret*.json
+*service-account*.json
+*.p12
 *.pem
 *.p12
 .env

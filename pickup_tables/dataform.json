@@ -1,0 +1,7 @@
+{
+  "warehouse": "bigquery",
+  "defaultSchema": "Pace",
+  "defaultDatabase": "devrebel-big-query-database",
+  "defaultLocation": "us-central1",
+  "assertionSchema": "assertions"
+}

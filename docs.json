@@ -1,0 +1,201 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "almond",
+  "name": "Metrics Library",
+  "description": "REVREBEL's source of truth for hospitality metrics, table models, naming standards, and data architecture.",
+  "colors": {
+    "primary": "#163666",
+    "light": "#fafafa",
+    "dark": "#163666"
+  },
+  "favicon": {
+    "light": "/favicon-light.svg",
+    "dark": "/favicon-dark.svg"
+  },
+  "logo": {
+    "light": "/logo/dark.svg",
+    "dark": "/logo/light.svg"
+  },
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Library",
+          "href": "/metrics-library",
+          "icon": "book-open-cover"
+        },
+        {
+          "anchor": "REVREBEL",
+          "href": "https://revrebel.io",
+          "icon": "globe"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://revrebel.io/blog",
+          "icon": "newspaper"
+        }
+      ]
+    },
+    "products": [
+      {
+        "product": "Metrics Library",
+        "tabs": [
+          {
+            "tab": "Library",
+            "icon": "book-open-cover",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "metrics-library/index"
+                ]
+              },
+              {
+                "group": "Standards",
+                "pages": [
+                  "metrics-library/column-naming-standards",
+                  "metrics-library/table-prefix-standards",
+                  "metrics-library/table-architecture"
+                ]
+              },
+              {
+                "group": "Table Models",
+                "pages": [
+                  "metrics-library/costar-processing-spec",
+                  "metrics-library/costar-processing-guide",
+                  "metrics-library/forecast-budget-pricing",
+                  "metrics-library/events-table-model",
+                  "metrics-library/demand-table-models",
+                  "metrics-library/source-file-ingestion"
+                ]
+              },
+              {
+                "group": "Dimensional Models",
+                "pages": [
+                  "metrics-library/roomtype-model",
+                  "metrics-library/segment-model",
+                  "metrics-library/source-channel-rate-model"
+                ]
+              },
+              {
+                "group": "Audits",
+                "pages": [
+                  "metrics-library/column-propagation-audit"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Guides",
+            "icon": "route",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "development"
+                ]
+              },
+              {
+                "group": "Configuration",
+                "pages": [
+                  "essentials/settings",
+                  "essentials/navigation"
+                ]
+              },
+              {
+                "group": "Writing Content",
+                "pages": [
+                  "essentials/markdown",
+                  "essentials/code",
+                  "essentials/images",
+                  "essentials/components",
+                  "essentials/reusable-snippets"
+                ]
+              },
+              {
+                "group": "Agent Ready",
+                "pages": [
+                  "agent-ready/prompt",
+                  "agent-ready/visibility",
+                  "agent-ready/contextual",
+                  "ai-tools/cursor",
+                  "ai-tools/claude-code",
+                  "ai-tools/windsurf"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "icon": "square-terminal",
+            "groups": [
+              {
+                "group": "API Documentation",
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Endpoint Examples",
+                "pages": [
+                  "api-reference/endpoint/get",
+                  "api-reference/endpoint/create",
+                  "api-reference/endpoint/delete",
+                  "api-reference/endpoint/webhook"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Helpdesk",
+        "href": "mailto:helpdesk@revrebel.io"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open Metrics",
+      "href": "https://metrics.revrebel.io"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/revrebel",
+      "linkedin": "https://linkedin.com/company/revrebel"
+    }
+  },
+  "background": {
+    "color": {
+      "light": "#fafafa",
+      "dark": "#163666"
+    }
+  },
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "family": "Roboto",
+    "weight": 400,
+    "source": "https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Khand:wght@300;400;500;600;700&family=Poppins:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
+    "format": "woff2"
+  }
+}
