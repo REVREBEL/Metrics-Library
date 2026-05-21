@@ -1,0 +1,87 @@
+# Drop this file into the SOURCE repo at:
+#   .github/workflows/sync-docs.yml
+#
+# It converts .md files under docs/ to .mdx and opens a PR
+# against REVREBEL/docs that drops them into a per-repo subfolder.
+#
+# Required secret on the source repo:
+#   DOCS_SYNC_TOKEN  - a fine-grained PAT (or GitHub App token) with
+#                      contents:write + pull-requests:write on REVREBEL/docs.
+
+name: Sync docs to REVREBEL/docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'docs.json'
+      - '.github/workflows/sync-docs.yml'
+  workflow_dispatch:
+
+env:
+  # Subfolder inside REVREBEL/docs that this repo owns.
+  # Change per repo: metrics-library, metrics-dataform, brand, etc.
+  TARGET_DIR: metrics-library
+  SOURCE_DIR: docs
+  DOCS_REPO: REVREBEL/docs
+  DOCS_BRANCH: main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DOCS_REPO }}
+          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          path: docs-repo
+
+      - name: Sync .md -> .mdx into ${{ env.TARGET_DIR }}/
+        run: |
+          set -euo pipefail
+          mkdir -p "docs-repo/${TARGET_DIR}"
+
+          # Wipe the target folder so deletions in source propagate.
+          # (Keeps a .gitkeep so the dir is never empty.)
+          find "docs-repo/${TARGET_DIR}" -mindepth 1 -not -name '.gitkeep' -delete || true
+
+          # Copy markdown as .mdx, preserve subdir structure.
+          cd "source/${SOURCE_DIR}"
+          find . -type f \( -name '*.md' -o -name '*.mdx' \) | while read -r f; do
+            rel="${f#./}"
+            out="../../docs-repo/${TARGET_DIR}/${rel%.md}.mdx"
+            mkdir -p "$(dirname "$out")"
+            cp "$f" "$out"
+          done
+
+          # Copy non-markdown assets (images, etc.)
+          cd ../..
+          if [ -d "source/${SOURCE_DIR}/assets" ]; then
+            mkdir -p "docs-repo/${TARGET_DIR}/assets"
+            cp -R "source/${SOURCE_DIR}/assets/." "docs-repo/${TARGET_DIR}/assets/"
+          fi
+
+      - name: Open PR against ${{ env.DOCS_REPO }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          path: docs-repo
+          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          branch: sync/${{ github.event.repository.name }}
+          base: ${{ env.DOCS_BRANCH }}
+          commit-message: "docs: sync ${{ github.event.repository.name }} (${{ github.sha }})"
+          title: "docs: sync from ${{ github.event.repository.name }}"
+          body: |
+            Automated sync from `${{ github.repository }}` @ `${{ github.sha }}`.
+
+            Source folder: `${{ env.SOURCE_DIR }}/`
+            Target folder: `${{ env.TARGET_DIR }}/`
+
+            Merge to publish.
+          delete-branch: true
