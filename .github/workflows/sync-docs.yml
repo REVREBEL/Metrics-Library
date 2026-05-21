@@ -20,6 +20,8 @@ on:
   workflow_dispatch:
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
   # Subfolder inside REVREBEL/docs that this repo owns.
   # Change per repo: metrics-library, metrics-dataform, brand, etc.
   TARGET_DIR: metrics-library
@@ -32,12 +34,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: source
 
       - name: Checkout docs repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.DOCS_REPO }}
           token: ${{ secrets.METRICS_LIBRARY_DOCS_SYNC_TOKEN }}
@@ -69,7 +71,7 @@ jobs:
           fi
 
       - name: Open PR against ${{ env.DOCS_REPO }}
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           path: docs-repo
           token: ${{ secrets.METRICS_LIBRARY_DOCS_SYNC_TOKEN }}
