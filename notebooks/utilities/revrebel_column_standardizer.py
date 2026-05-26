@@ -20,11 +20,44 @@ Purpose:
 - keep source-specific mapping logic out of one-off notebooks
 """
 
+from pathlib import Path
+
+content = '''"""
+REVREBEL Metrics Library column standardization helpers.
+
+Use this module inside ingestion/processing notebooks before exporting
+standardized CSVs or loading dataframes to BigQuery.
+
+Current date standards:
+- stay_date: property stay / occupancy / service date the metrics apply to
+- snap_date: point-in-time report or snapshot date
+- arrival_date: reservation arrival/check-in date
+- departure_date: reservation departure/check-out date
+- book_date: reservation booking / creation date
+- insert_date: row creation / ingestion date
+- updated_date: row update date
+
+Purpose:
+- normalize raw source headers into safe snake_case
+- rename known source columns to REVREBEL standard names
+- add required ingestion metadata columns
+- align IDeaS pace exports to the revised Dataform staging schemas
+- print before/after column mapping reports
+- keep source-specific mapping logic out of one-off notebooks
+
+Important:
+- Business View exports are treated as the segment grain.
+- This module does not load data to BigQuery.
+- This module does not perform lookup enrichment for segment, roomclass, or roomtype.
+  It only creates the required staging columns and leaves unmapped/enrichment fields
+  as null placeholders unless the source already provides them.
+"""
+
 from __future__ import annotations
 
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, Iterable, Mapping, Optional
 
 import pandas as pd
 
@@ -49,6 +82,7 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "snapshot_date": "snap_date",
     "snap_date": "snap_date",
     "comparison_date_last_year": "comparison_date_ly",
+    "comparison_date_ly": "comparison_date_ly",
     "arrival_date": "arrival_date",
     "check_in": "arrival_date",
     "check_in_date": "arrival_date",
@@ -61,8 +95,10 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
     "book_date": "book_date",
     "created_date": "insert_date",
     "inserted_date": "insert_date",
+    "insert_date": "insert_date",
     "updated_date": "updated_date",
     "etl_date": "etl_date",
+    "day_of_week": "day_of_week",
 
     # Property
     "hotel": "property_name",
@@ -301,8 +337,25 @@ COMMON_COLUMN_MAP: Dict[str, str] = {
 
 
 REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
-    "snap_property": {**COMMON_COLUMN_MAP},
+    # Revised pace staging/snapshot report names.
+    "stg_pace_property": {**COMMON_COLUMN_MAP},
     "snap_pace_property": {**COMMON_COLUMN_MAP},
+    "fact_pace_property": {**COMMON_COLUMN_MAP},  # legacy notebook alias
+    "snap_property": {**COMMON_COLUMN_MAP},  # legacy notebook alias
+    "property": {**COMMON_COLUMN_MAP},
+
+    "stg_pace_segment": {
+        **COMMON_COLUMN_MAP,
+        "today_rooms_commit": "rms_otb",
+        "today_room_revenue_commit": "rev_otb",
+        "stly_date_rooms_commit": "rms_stly",
+        "stly_date_room_revenue_commit": "rev_stly",
+        "st2y_date_rooms_commit": "rms_st2y",
+        "st2y_date_room_revenue_commit": "rev_st2y",
+        "business_view": "segment",
+        "forecast_group": "segment",
+        "market_segment": "segment",
+    },
     "snap_pace_segment": {
         **COMMON_COLUMN_MAP,
         "today_rooms_commit": "rms_otb",
@@ -315,11 +368,30 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
         "forecast_group": "segment",
         "market_segment": "segment",
     },
-    "snap_pace_roomtype": {
+    "fact_pace_segment": {
         **COMMON_COLUMN_MAP,
-        "physical_capacity": "available_rms",
-        "capacity_this_year": "available_rms",
-        "capacity_last_year_actual": "available_rms_ly",
+        "today_rooms_commit": "rms_otb",
+        "today_room_revenue_commit": "rev_otb",
+        "stly_date_rooms_commit": "rms_stly",
+        "stly_date_room_revenue_commit": "rev_stly",
+        "st2y_date_rooms_commit": "rms_st2y",
+        "st2y_date_room_revenue_commit": "rev_st2y",
+        "business_view": "segment",
+        "forecast_group": "segment",
+        "market_segment": "segment",
+    },  # legacy notebook alias
+    "business_view": {
+        **COMMON_COLUMN_MAP,
+        "business_view": "segment",
+        "forecast_group": "segment",
+        "market_segment": "segment",
+    },
+
+    "stg_pace_roomclass": {
+        **COMMON_COLUMN_MAP,
+        "room_class": "roomclass",
+        "roomclass": "roomclass",
+        "room_class_code": "roomclass_code",
     },
     "snap_pace_roomclass": {
         **COMMON_COLUMN_MAP,
@@ -327,6 +399,45 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
         "roomclass": "roomclass",
         "room_class_code": "roomclass_code",
     },
+    "fact_pace_roomclass": {
+        **COMMON_COLUMN_MAP,
+        "room_class": "roomclass",
+        "roomclass": "roomclass",
+        "room_class_code": "roomclass_code",
+    },  # legacy notebook alias
+    "roomclass": {
+        **COMMON_COLUMN_MAP,
+        "room_class": "roomclass",
+        "roomclass": "roomclass",
+        "room_class_code": "roomclass_code",
+    },
+
+    "stg_pace_roomtype": {
+        **COMMON_COLUMN_MAP,
+        "physical_capacity": "available_rms",
+        "capacity_this_year": "available_rms",
+        "capacity_last_year_actual": "available_rms_ly",
+    },
+    "snap_pace_roomtype": {
+        **COMMON_COLUMN_MAP,
+        "physical_capacity": "available_rms",
+        "capacity_this_year": "available_rms",
+        "capacity_last_year_actual": "available_rms_ly",
+    },
+    "fact_pace_roomtype": {
+        **COMMON_COLUMN_MAP,
+        "physical_capacity": "available_rms",
+        "capacity_this_year": "available_rms",
+        "capacity_last_year_actual": "available_rms_ly",
+    },  # legacy notebook alias
+    "roomtype": {
+        **COMMON_COLUMN_MAP,
+        "physical_capacity": "available_rms",
+        "capacity_this_year": "available_rms",
+        "capacity_last_year_actual": "available_rms_ly",
+    },
+
+    # Existing non-pace report aliases retained.
     "snap_demand_property": COMMON_COLUMN_MAP,
     "snap_demand_segment": COMMON_COLUMN_MAP,
     "snap_demand_channel": {
@@ -350,6 +461,103 @@ REPORT_COLUMN_MAPS: Dict[str, Dict[str, str]] = {
 }
 
 
+PACE_STAGING_COLUMNS: Dict[str, list[str]] = {
+    "property": [
+        "property_code", "property_name", "snap_date", "stay_date", "comparison_date_ly",
+        "available_rms", "available_rms_ly", "remaining_rms", "remaining_rms_ly",
+        "rms_otb", "rev_otb", "rms_ly", "rev_ly", "rms_stly", "rev_stly",
+        "rms_st2y", "rev_st2y", "rms_bgt", "rev_bgt", "rms_fct", "rev_fct",
+        "adr_fct",
+        "property_rms_fct", "property_rms_fct_ly", "property_rev_fct",
+        "property_rev_fct_ly",
+        "group_rms_otb", "group_rms_ly", "group_rms_stly", "group_rms_st2y",
+        "transient_rms_otb", "transient_rms_ly", "transient_rms_stly",
+        "transient_rms_st2y",
+        "demand_total", "demand_total_ly", "demand_group", "demand_group_ly",
+        "demand_transient", "demand_transient_ly",
+        "system_demand_total", "system_demand_total_ly",
+        "system_demand_group", "system_demand_group_ly",
+        "system_demand_transient", "system_demand_transient_ly",
+        "user_demand_total", "user_demand_total_ly",
+        "user_constrained_demand_group", "user_constrained_demand_group_ly",
+        "user_unconstrained_demand_transient", "user_unconstrained_demand_transient_ly",
+        "arrival_rms", "arrival_rms_ly", "departure_rms", "departure_rms_ly",
+        "cx_rms", "cx_rms_ly", "ns_rms", "ns_rms_ly", "ooo_rms", "ooo_rms_ly",
+        "na_other_rms", "na_other_rms_ly", "overbook_rms", "overbook_rms_ly",
+        "adr_otb", "adr_ly", "adr_fct_ly", "revpar_otb", "revpar_ly",
+        "revpar_fct", "revpar_fct_ly",
+        "lrv", "lrv_ly", "wash_pct", "wash_pct_ly", "bar_price", "bar_price_ly",
+        "primary_event", "primary_event_ly",
+        "source_system", "source_report", "source_file",
+        "load_ts", "insert_date", "updated_date",
+    ],
+    "segment": [
+        "property_code", "property_name", "snap_date", "stay_date", "comparison_date_ly",
+        "segment", "segment_code", "segment_group", "segment_group_code",
+        "finance_segment", "finance_segment_code", "segment_category", "rate_basis",
+        "segment_map", "segment_code_map",
+        "available_rms", "rms_otb", "rev_otb", "rms_ly", "rev_ly", "rms_stly",
+        "rev_stly", "rms_st2y", "rev_st2y", "rms_bgt", "rev_bgt", "rms_fct",
+        "rev_fct", "adr_fct",
+        "cx_rms", "cx_rms_ly", "ns_rms", "ns_rms_ly",
+        "source_system", "source_report", "source_file",
+        "load_ts", "insert_date", "updated_date",
+    ],
+    "roomclass": [
+        "property_code", "property_name", "snap_date", "stay_date", "comparison_date_ly",
+        "roomclass", "roomclass_code", "roomclass_map", "roomclass_code_map",
+        "available_rms", "rms_otb", "rev_otb", "rms_ly", "rev_ly", "rms_stly",
+        "rev_stly", "rms_st2y", "rev_st2y", "rms_bgt", "rev_bgt", "rms_fct",
+        "rev_fct", "adr_fct",
+        "system_unconstrained_demand", "system_unconstrained_demand_ly",
+        "user_demand", "user_demand_ly",
+        "system_wash_pct", "system_wash_pct_ly", "user_wash_pct", "user_wash_pct_ly",
+        "cx_rms", "cx_rms_ly", "ns_rms", "ns_rms_ly",
+        "source_system", "source_report", "source_file",
+        "load_ts", "insert_date", "updated_date",
+    ],
+    "roomtype": [
+        "property_code", "property_name", "snap_date", "stay_date", "comparison_date_ly",
+        "roomtype", "roomtype_code", "roomtype_map", "roomtype_code_map",
+        "roomclass", "roomclass_code", "bedtype", "bedtype_code", "roomfeature",
+        "roompool", "roompool_code",
+        "available_rms", "rms_otb", "rev_otb", "rms_ly", "rev_ly", "rms_stly",
+        "rev_stly", "rms_st2y", "rev_st2y", "rms_bgt", "rev_bgt", "rms_fct",
+        "rev_fct", "adr_fct",
+        "cx_rms", "cx_rms_ly", "ns_rms", "ns_rms_ly",
+        "source_system", "source_report", "source_file",
+        "load_ts", "insert_date", "updated_date",
+    ],
+}
+
+
+PACE_REPORT_TO_GRAIN: Dict[str, str] = {
+    "property": "property",
+    "snap_property": "property",
+    "stg_pace_property": "property",
+    "snap_pace_property": "property",
+    "fact_pace_property": "property",
+
+    "business_view": "segment",
+    "segment": "segment",
+    "stg_pace_segment": "segment",
+    "snap_pace_segment": "segment",
+    "fact_pace_segment": "segment",
+
+    "roomclass": "roomclass",
+    "room_class": "roomclass",
+    "stg_pace_roomclass": "roomclass",
+    "snap_pace_roomclass": "roomclass",
+    "fact_pace_roomclass": "roomclass",
+
+    "roomtype": "roomtype",
+    "room_type": "roomtype",
+    "stg_pace_roomtype": "roomtype",
+    "snap_pace_roomtype": "roomtype",
+    "fact_pace_roomtype": "roomtype",
+}
+
+
 def build_rename_map(
     columns: list[Any],
     source_report: Optional[str] = None,
@@ -358,9 +566,12 @@ def build_rename_map(
     """Build the actual rename map for a list of source columns."""
     normalized_columns = [normalize_header(col) for col in columns]
 
+    report_key = normalize_header(source_report) if source_report else None
     rename_map: Dict[str, str] = dict(COMMON_COLUMN_MAP)
-    if source_report and source_report in REPORT_COLUMN_MAPS:
-        rename_map.update(REPORT_COLUMN_MAPS[source_report])
+
+    if report_key and report_key in REPORT_COLUMN_MAPS:
+        rename_map.update(REPORT_COLUMN_MAPS[report_key])
+
     if extra_map:
         rename_map.update({normalize_header(k): v for k, v in extra_map.items()})
 
@@ -379,7 +590,11 @@ def get_column_report(
     """Return a before/after column-standardization report."""
     original_columns = list(df.columns)
     normalized_columns = [normalize_header(col) for col in original_columns]
-    rename_map = build_rename_map(original_columns, source_report=source_report, extra_map=extra_map)
+    rename_map = build_rename_map(
+        original_columns,
+        source_report=source_report,
+        extra_map=extra_map,
+    )
 
     rows = []
     for original_col, normalized_col in zip(original_columns, normalized_columns):
@@ -416,7 +631,12 @@ def standardize_columns(
     output = df.copy()
     output.columns = [normalize_header(col) for col in output.columns]
 
-    rename_map = build_rename_map(list(df.columns), source_report=source_report, extra_map=extra_map)
+    rename_map = build_rename_map(
+        list(df.columns),
+        source_report=source_report,
+        extra_map=extra_map,
+    )
+
     return output.rename(columns=rename_map)
 
 
@@ -428,9 +648,11 @@ def add_ingestion_metadata(
     output = df.copy()
     metadata = dict(metadata or {})
 
+    today = pd.Timestamp.utcnow().date()
     defaults: Dict[str, Any] = {
         "load_ts": datetime.now(timezone.utc),
-        "insert_date": pd.Timestamp.utcnow().date(),
+        "insert_date": today,
+        "updated_date": today,
     }
     defaults.update(metadata)
 
@@ -454,6 +676,142 @@ def standardize_dataframe(
     if print_report:
         print_column_report(df, source_report=source_report, extra_map=extra_map)
 
-    output = standardize_columns(df, source_report=source_report, extra_map=extra_map)
+    output = standardize_columns(
+        df,
+        source_report=source_report,
+        extra_map=extra_map,
+    )
     output = add_ingestion_metadata(output, metadata=metadata)
     return output
+
+
+def infer_pace_grain(
+    source_report: Optional[str] = None,
+    grain: Optional[str] = None,
+) -> str:
+    """Infer the pace grain from an explicit grain or source report name."""
+    key = normalize_header(grain or source_report)
+
+    if key in PACE_REPORT_TO_GRAIN:
+        return PACE_REPORT_TO_GRAIN[key]
+
+    raise ValueError(
+        "Unable to infer pace grain. Pass one of: "
+        f"{', '.join(sorted(PACE_STAGING_COLUMNS.keys()))}."
+    )
+
+
+def derive_property_demand_fields(df: pd.DataFrame) -> pd.DataFrame:
+    """Populate generic property demand fields from system demand fields when needed."""
+    output = df.copy()
+
+    demand_defaults = {
+        "demand_total": "system_demand_total",
+        "demand_total_ly": "system_demand_total_ly",
+        "demand_group": "system_demand_group",
+        "demand_group_ly": "system_demand_group_ly",
+        "demand_transient": "system_demand_transient",
+        "demand_transient_ly": "system_demand_transient_ly",
+    }
+
+    for target, source in demand_defaults.items():
+        if target not in output.columns and source in output.columns:
+            output[target] = output[source]
+        elif target in output.columns and source in output.columns:
+            output[target] = output[target].fillna(output[source])
+
+    return output
+
+
+def align_columns(
+    df: pd.DataFrame,
+    columns: Iterable[str],
+    drop_extra: bool = True,
+    fill_value: Any = pd.NA,
+) -> pd.DataFrame:
+    """Add missing columns and optionally return only the supplied columns in order."""
+    output = df.copy()
+    columns = list(columns)
+
+    for column in columns:
+        if column not in output.columns:
+            output[column] = fill_value
+
+    if drop_extra:
+        return output[columns]
+
+    ordered = output[columns]
+    extra_columns = [column for column in output.columns if column not in columns]
+    return pd.concat([ordered, output[extra_columns]], axis=1)
+
+
+def align_pace_dataframe(
+    df: pd.DataFrame,
+    grain: Optional[str] = None,
+    source_report: Optional[str] = None,
+    drop_extra: bool = True,
+    drop_day_of_week: bool = True,
+) -> pd.DataFrame:
+    """
+    Align a standardized pace dataframe to the revised Dataform staging schema.
+
+    Intended for processing/export notebooks that produce BigQuery-ready CSVs.
+    This function does not load data to BigQuery and does not perform lookup
+    enrichment. Missing lookup/enrichment columns are added as null placeholders.
+    """
+    resolved_grain = infer_pace_grain(source_report=source_report, grain=grain)
+    output = df.copy()
+
+    if drop_day_of_week:
+        output = output.drop(columns=["day_of_week"], errors="ignore")
+
+    output = add_ingestion_metadata(output)
+
+    if resolved_grain == "property":
+        output = derive_property_demand_fields(output)
+
+    return align_columns(
+        output,
+        PACE_STAGING_COLUMNS[resolved_grain],
+        drop_extra=drop_extra,
+    )
+
+
+def standardize_pace_dataframe(
+    df: pd.DataFrame,
+    source_report: str,
+    grain: Optional[str] = None,
+    metadata: Optional[Mapping[str, Any]] = None,
+    extra_map: Optional[Mapping[str, str]] = None,
+    print_report: bool = False,
+    drop_extra: bool = True,
+) -> pd.DataFrame:
+    """
+    Standardize and align a pace dataframe to the revised Dataform staging schema.
+
+    Business View exports should use source_report="snap_pace_segment" or
+    grain="segment".
+    """
+    output = standardize_dataframe(
+        df,
+        source_report=source_report,
+        metadata=metadata,
+        extra_map=extra_map,
+        print_report=print_report,
+    )
+
+    return align_pace_dataframe(
+        output,
+        grain=grain,
+        source_report=source_report,
+        drop_extra=drop_extra,
+    )
+'''
+
+path = Path('/mnt/data/revrebel_column_standardizer.py')
+path.write_text(content, encoding='utf-8')
+
+# quick syntax check
+compile(content, str(path), 'exec')
+
+path.as_posix()
