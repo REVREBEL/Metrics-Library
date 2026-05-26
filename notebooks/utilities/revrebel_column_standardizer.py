@@ -1,30 +1,6 @@
 """
 REVREBEL Metrics Library column standardization helpers.
 
-Use this module inside ingestion notebooks before loading dataframes to BigQuery.
-
-Current hotel-date standard:
-- stay_date: hotel stay / occupancy / service date the metrics apply to
-- snap_date: point-in-time report or snapshot date
-- arrival_date: reservation arrival/check-in date
-- departure_date: reservation departure/check-out date
-- book_date: reservation booking / creation date
-- insert_date: row creation / ingestion date
-- updated_date: row update date
-
-Purpose:
-- normalize raw source headers into safe snake_case
-- rename known source columns to REVREBEL standard names
-- add required ingestion metadata columns
-- print before/after column mapping reports
-- keep source-specific mapping logic out of one-off notebooks
-"""
-
-from pathlib import Path
-
-content = '''"""
-REVREBEL Metrics Library column standardization helpers.
-
 Use this module inside ingestion/processing notebooks before exporting
 standardized CSVs or loading dataframes to BigQuery.
 
@@ -806,12 +782,3 @@ def standardize_pace_dataframe(
         source_report=source_report,
         drop_extra=drop_extra,
     )
-'''
-
-path = Path('/mnt/data/revrebel_column_standardizer.py')
-path.write_text(content, encoding='utf-8')
-
-# quick syntax check
-compile(content, str(path), 'exec')
-
-path.as_posix()
