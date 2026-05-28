@@ -59,6 +59,13 @@
                 ]
               },
               {
+                "group": "Source Files",
+                "pages": [
+                  "metrics-library/source-files/index",
+                  "metrics-library/source-files/ideas-pace"
+                ]
+              },
+              {
                 "group": "Table Models",
                 "pages": [
                   "metrics-library/costar-processing-spec",
