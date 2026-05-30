@@ -21,7 +21,7 @@
       "anchors": [
         {
           "anchor": "Library",
-          "href": "/metrics-library",
+          "href": "/",
           "icon": "book-open-cover"
         },
         {
@@ -47,63 +47,75 @@
               {
                 "group": "Overview",
                 "pages": [
-                  "metrics-library/index"
+                  "index"
                 ]
               },
               {
                 "group": "Standards",
                 "pages": [
-                  "metrics-library/column-naming-standards",
-                  "metrics-library/table-prefix-standards",
-                  "metrics-library/table-architecture"
+                  "column-naming-standards",
+                  "table_prefix_standards",
+                  "revrebel-bi-table-architecture"
                 ]
               },
               {
                 "group": "Source Files",
                 "pages": [
-                  "metrics-library/source-files/index",
-                  "metrics-library/source-files/ideas-pace"
+                  "source-file-ingestion-model"
+                ]
+              },
+              {
+                "group": "CoStar",
+                "pages": [
+                  "CoStar/costar_metrics_data_model__processing_specification",
+                  "CoStar/costar_metrics_data_model_processing_guide"
+                ]
+              },
+              {
+                "group": "Google Analytics",
+                "pages": [
+                  "GoogleAnalytics/index",
+                  "GoogleAnalytics/data-reorganization-framework",
+                  "GoogleAnalytics/source-and-staging-layers",
+                  "GoogleAnalytics/placement-interaction-layer",
+                  "GoogleAnalytics/merchandise-interaction-layer",
+                  "GoogleAnalytics/mapping-layer",
+                  "GoogleAnalytics/regular-reporting-layer",
+                  "GoogleAnalytics/reconciliation-layer",
+                  "GoogleAnalytics/placement-merchandise-attribution",
+                  "GoogleAnalytics/placement-yield-fact-layer",
+                  "GoogleAnalytics/events",
+                  "GoogleAnalytics/audiences",
+                  "GoogleAnalytics/demographic-details",
+                  "GoogleAnalytics/ecommerce-purchases",
+                  "GoogleAnalytics/landing-page",
+                  "GoogleAnalytics/pages-and-screens",
+                  "GoogleAnalytics/promotions",
+                  "GoogleAnalytics/tech-details",
+                  "GoogleAnalytics/traffic-acquisition",
+                  "GoogleAnalytics/user-acquisition"
                 ]
               },
               {
                 "group": "Table Models",
                 "pages": [
-                  "metrics-library/costar-processing-spec",
-                  "metrics-library/costar-processing-guide",
-                  "metrics-library/forecast-budget-pricing",
-                  "metrics-library/events-table-model",
-                  "metrics-library/demand-table-models",
-                  "metrics-library/source-file-ingestion"
-                ]
-              },
-              {
-                "group": "GA4 Origin Tables",
-                "pages": [
-                  "metrics_g4a/index",
-                  "metrics_g4a/p_ga4_Events",
-                  "metrics_g4a/p_ga4_Audiences",
-                  "metrics_g4a/p_ga4_DemographicDetails",
-                  "metrics_g4a/p_ga4_EcommercePurchases",
-                  "metrics_g4a/p_ga4_LandingPage",
-                  "metrics_g4a/p_ga4_PagesAndScreens",
-                  "metrics_g4a/p_ga4_Promotions",
-                  "metrics_g4a/p_ga4_TechDetails",
-                  "metrics_g4a/p_ga4_TrafficAcquisition",
-                  "metrics_g4a/p_ga4_UserAcquisition"
+                  "forecast-budget-and-pricing-table-models",
+                  "events-table-model",
+                  "demand-table-models"
                 ]
               },
               {
                 "group": "Dimensional Models",
                 "pages": [
-                  "metrics-library/roomtype-model",
-                  "metrics-library/segment-model",
-                  "metrics-library/source-channel-rate-model"
+                  "roomtype-model",
+                  "segment-model",
+                  "source-channel-rate-model"
                 ]
               },
               {
                 "group": "Audits",
                 "pages": [
-                  "metrics-library/column-propagation-audit"
+                  "table-architecture-column-propagation-audit"
                 ]
               }
             ]
@@ -115,7 +127,6 @@
               {
                 "group": "Getting Started",
                 "pages": [
-                  "index",
                   "quickstart",
                   "development"
                 ]
