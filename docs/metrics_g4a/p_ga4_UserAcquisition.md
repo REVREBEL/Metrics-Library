@@ -1,9 +1,8 @@
 ---
-
 title: "p_ga4_UserAcquisition"
 sidebarTitle: "User Acquisition"
 description: "User-scoped first-touch marketing channel and lifetime metric tracking."
---------------------------------------------------------------------------------------
+---
 
 # File 11: User Acquisition Table
 
