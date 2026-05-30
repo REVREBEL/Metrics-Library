@@ -1,9 +1,8 @@
 ---
-
 title: "p_ga4_TechDetails"
 sidebarTitle: "Tech Details"
 description: "User platform, operating system, and hardware specifications."
-----------------------------------------------------------------------------
+---
 
 # File 9: Tech Details Table
 
