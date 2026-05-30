@@ -1,9 +1,8 @@
 ---
-
 title: "p_ga4_TrafficAcquisition"
 sidebarTitle: "Traffic Acquisition"
 description: "Session-scoped marketing source, medium, and engagement metrics."
--------------------------------------------------------------------------------
+---
 
 # File 10: Traffic Acquisition Table
 
@@ -15,19 +14,19 @@ The `p_ga4_TrafficAcquisition_281286275` table measures marketing campaign and c
 
 ## Table Schema
 
-| Column Name                  | Data Type | Column Definition & Calculated Metric Representation                                                                                                              |
-| ---------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sessionCampaignName`        | STRING    | The marketing campaign name for a session.                                                                                                                        |
-| `sessionDefaultChannelGroup` | STRING    | The session's default channel group based primarily on source and medium rules.                                                                                   |
-| `sessionMedium`              | STRING    | The medium that initiated a session on your website or app.                                                                                                       |
-| `sessionSource`              | STRING    | The source that initiated a session on your website or app.                                                                                                       |
-| `sessionSourceMedium`        | STRING    | The combined values of the dimensions `sessionSource` and `sessionMedium`.                                                                                        |
-| `sessions`                   | INTEGER   | The total volume of sessions initiated from the specified source and medium.                                                                                      |
-| `engagedSessions`            | INTEGER   | The number of sessions that lasted longer than 10 seconds, had a key event, or had two or more screen views.                                                      |
-| `engagementRate`             | FLOAT     | The percentage of engaged sessions relative to total sessions. Formulated as:<br><br>$$\text{Engagement Rate} = \frac{\text{Engaged Sessions}}{\text{Sessions}}$$ |
-| `keyEvents`                  | INTEGER   | The volume of conversion actions completed within sessions driven by the specified source and medium.                                                             |
-| `sessionKeyEventRate`        | FLOAT     | The percentage of sessions in which any key event was triggered.                                                                                                  |
-| `totalRevenue`               | FLOAT     | The sum of revenue from purchases, subscriptions, and advertising, minus refunds.                                                                                 |
+| Column Name                  | Data Type | Column Definition & Calculated Metric Representation |
+| ---------------------------- | --------- | ---------------------------------------------------- |
+| `sessionCampaignName`        | STRING    | The marketing campaign name for a session. |
+| `sessionDefaultChannelGroup` | STRING    | The session's default channel group based primarily on source and medium rules. |
+| `sessionMedium`              | STRING    | The medium that initiated a session on your website or app. |
+| `sessionSource`              | STRING    | The source that initiated a session on your website or app. |
+| `sessionSourceMedium`        | STRING    | The combined values of the dimensions `sessionSource` and `sessionMedium`. |
+| `sessions`                   | INTEGER   | The total volume of sessions initiated from the specified source and medium. |
+| `engagedSessions`            | INTEGER   | The number of sessions that lasted longer than 10 seconds, had a key event, or had two or more screen views. |
+| `engagementRate`             | FLOAT     | The percentage of engaged sessions relative to total sessions. |
+| `keyEvents`                  | INTEGER   | The volume of conversion actions completed within sessions driven by the specified source and medium. |
+| `sessionKeyEventRate`        | FLOAT     | The percentage of sessions in which any key event was triggered. |
+| `totalRevenue`               | FLOAT     | The sum of revenue from purchases, subscriptions, and advertising, minus refunds. |
 
 ## Analytical Considerations
 
