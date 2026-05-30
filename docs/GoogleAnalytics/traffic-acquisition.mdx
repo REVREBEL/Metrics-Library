@@ -1,0 +1,35 @@
+---
+title: "G4A Traffic Acquisition"
+sidebarTitle: "Traffic Acquisition"
+description: "Session-scoped marketing source, medium, and engagement metrics."
+---
+
+# Traffic Acquisition Table
+
+## Schema Purpose
+
+The `TrafficAcquisition` table measures marketing campaign and channel performance scoped at the session level. It evaluates the specific origin points, including source and medium, that drove individual sessions, allowing analysts to gauge current marketing campaign effectiveness, traffic quality, and session-level conversion rates.
+
+## Table Schema
+
+| Column Name                  | Data Type | Column Definition & Calculated Metric Representation |
+| ---------------------------- | --------- | ---------------------------------------------------- |
+| `sessionCampaignName`        | STRING    | The marketing campaign name for a session. |
+| `sessionDefaultChannelGroup` | STRING    | The session's default channel group based primarily on source and medium rules. |
+| `sessionMedium`              | STRING    | The medium that initiated a session on your website or app. |
+| `sessionSource`              | STRING    | The source that initiated a session on your website or app. |
+| `sessionSourceMedium`        | STRING    | The combined values of the dimensions `sessionSource` and `sessionMedium`. |
+| `sessions`                   | INTEGER   | The total volume of sessions initiated from the specified source and medium. |
+| `engagedSessions`            | INTEGER   | The number of sessions that lasted longer than 10 seconds, had a key event, or had two or more screen views. |
+| `engagementRate`             | FLOAT     | The percentage of engaged sessions relative to total sessions. |
+| `keyEvents`                  | INTEGER   | The volume of conversion actions completed within sessions driven by the specified source and medium. |
+| `sessionKeyEventRate`        | FLOAT     | The percentage of sessions in which any key event was triggered. |
+| `totalRevenue`               | FLOAT     | The sum of revenue from purchases, subscriptions, and advertising, minus refunds. |
+
+## Analytical Considerations
+
+The session-scoped acquisition model focuses on what brought a user to the site for each specific session. This differs from first-touch attribution, which only tracks the initial discovery source.
+
+Combining `engagedSessions` and `sessions` allows teams to calculate the session engagement rate, which is a key metric for evaluating traffic quality across different marketing channels:
+
+$$\text{Session Engagement Rate} = \frac{\text{engagedSessions}}{\text{sessions}}$$

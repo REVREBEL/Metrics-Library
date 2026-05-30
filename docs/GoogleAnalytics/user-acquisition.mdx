@@ -1,0 +1,33 @@
+---
+title: "G4A User Acquisition"
+sidebarTitle: "User Acquisition"
+description: "User-scoped first-touch marketing channel and lifetime metric tracking."
+---
+
+# User Acquisition Table
+
+## Schema Purpose
+
+The `UserAcquisition` table focuses on the first-touch channel that originally acquired a user. This table evaluates long-term marketing spend and user lifetime-to-date behavior, grouping users by their initial point of discovery rather than session-by-session origins.
+
+## Table Schema
+
+| Column Name                    | Data Type | Column Definition & Calculated Metric Representation                                                 |
+| ------------------------------ | --------- | ---------------------------------------------------------------------------------------------------- |
+| `firstUserCampaignName`        | STRING    | The name of the marketing campaign that first acquired the user.                                     |
+| `firstUserDefaultChannelGroup` | STRING    | The default channel group that first acquired the user, based on source and medium.                  |
+| `firstUserMedium`              | STRING    | The medium that first acquired the user to your website or app.                                      |
+| `firstUserSource`              | STRING    | The source that first acquired the user to your website or app.                                      |
+| `firstUserSourceMedium`        | STRING    | The combined values of the dimensions `firstUserSource` and `firstUserMedium`.                       |
+| `activeUsers`                  | INTEGER   | The number of distinct users who visited your website or application.                                |
+| `engagedSessions`              | INTEGER   | The number of subsequent sessions that had an engaged event.                                         |
+| `engagementRate`               | FLOAT     | The percentage of engaged sessions logged by users first acquired by this channel.                   |
+| `keyEvents`                    | INTEGER   | The number of key events that occurred for users first acquired by this channel.                     |
+| `newUsers`                     | INTEGER   | The count of newly acquired users attributed to the first-touch channel during the reporting window. |
+| `totalRevenue`                 | FLOAT     | The sum of revenue from purchases, subscriptions, and advertising, minus refunds.                    |
+
+## Analytical Considerations
+
+Analyzing first-touch acquisition is essential for evaluating long-term marketing ROI and user lifetime value. Unlike session-based traffic tables, the metrics here attribute all subsequent purchases and engagement back to the original acquisition source.
+
+Comparing these numbers with those in the `p_ga4_TrafficAcquisition` table helps distinguish between campaigns that drive initial discovery and those that encourage returning, repeat transactions.
