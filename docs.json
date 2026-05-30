@@ -77,6 +77,22 @@
                 ]
               },
               {
+                "group": "GA4 Origin Tables",
+                "pages": [
+                  "metrics_g4a/index",
+                  "metrics_g4a/p_ga4_Events",
+                  "metrics_g4a/p_ga4_Audiences",
+                  "metrics_g4a/p_ga4_DemographicDetails",
+                  "metrics_g4a/p_ga4_EcommercePurchases",
+                  "metrics_g4a/p_ga4_LandingPage",
+                  "metrics_g4a/p_ga4_PagesAndScreens",
+                  "metrics_g4a/p_ga4_Promotions",
+                  "metrics_g4a/p_ga4_TechDetails",
+                  "metrics_g4a/p_ga4_TrafficAcquisition",
+                  "metrics_g4a/p_ga4_UserAcquisition"
+                ]
+              },
+              {
                 "group": "Dimensional Models",
                 "pages": [
                   "metrics-library/roomtype-model",
