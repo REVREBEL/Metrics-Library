@@ -1,9 +1,8 @@
 ---
-
 title: "p_ga4_LandingPage"
 sidebarTitle: "Landing Page"
 description: "Initial user entry paths and post-arrival conversion performance."
---------------------------------------------------------------------------------
+---
 
 # File 6: Landing Page Table
 
